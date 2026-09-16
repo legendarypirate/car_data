@@ -6,8 +6,8 @@ import type { Car } from "@/data/cars";
 import { formatPrice, statusCopy } from "@/lib/format";
 import { CarDetailFinancing } from "@/components/CarDetailFinancing";
 import { InquiryForm } from "@/components/InquiryForm";
-import { interiorHeroImage } from "@/components/CarDetailInterior";
 import { mergeCarTabs } from "@/lib/car-tabs";
+import { interiorHeroSrc } from "@/components/CarDetailInterior";
 
 type JumpTab = "design" | "interior" | "technology";
 
@@ -15,12 +15,12 @@ export function OverviewHeroCopy({ car }: { car: Car }) {
   const tabs = mergeCarTabs(car.tabs);
   return (
     <>
-      <p className="mt-3 text-[18px] text-white/90">
-        {tabs.overview.heroLine || `${car.bodyLabel || "Цахилгаан SUV"} – Илүү их боломжийн төлөө`}
-      </p>
-      <p className="mt-4 max-w-md text-[14px] leading-7 text-white/70">
-        {tabs.overview.heroText}
-      </p>
+      {(tabs.overview.heroLine || car.bodyLabel) && (
+        <p className="mt-3 text-[18px] text-white/90">{tabs.overview.heroLine || car.bodyLabel}</p>
+      )}
+      {tabs.overview.heroText && (
+        <p className="mt-4 max-w-md text-[14px] leading-7 text-white/70">{tabs.overview.heroText}</p>
+      )}
       <p className="mt-5 text-[22px] font-semibold tracking-tight">
         {formatPrice(car.price)}{" "}
         <span className="text-[13px] font-normal text-white/55">~ эхс</span>
@@ -65,29 +65,37 @@ export function CarDetailOverview({
     title: string;
     copy: string;
     image: string;
-  }> = [
-    {
-      tab: "design",
-      kicker: "DESIGN",
-      title: "Орчин үеийн, минимал шугам",
-      copy: "Аэродинамик их бие, LED гэрэл, цэвэр пропорц.",
-      image: car.image,
-    },
-    {
-      tab: "interior",
-      kicker: "INTERIOR",
-      title: "Тав тухтай, ухаалаг кабин",
-      copy: "Өргөн суудал, панорам дээвэр, гар хүрэхүйц удирдлага.",
-      image: interiorHeroImage,
-    },
-    {
-      tab: "technology",
-      kicker: "TECHNOLOGY",
-      title: "Аюулгүй, холбогдсон жолоодлого",
-      copy: "Safety Sense, 800V цэнэглэлт, Over-the-Air шинэчлэл.",
-      image: car.image,
-    },
-  ];
+  }> = (
+    [
+      {
+        tab: "design" as const,
+        kicker: tabs.design.label,
+        title: tabs.design.title,
+        copy: tabs.design.subtitle,
+        image: car.image,
+      },
+      {
+        tab: "interior" as const,
+        kicker: tabs.interior.label,
+        title: tabs.interior.title,
+        copy: tabs.interior.subtitle,
+        image: interiorHeroSrc(car),
+      },
+      {
+        tab: "technology" as const,
+        kicker: tabs.technology.label,
+        title: tabs.technology.title,
+        copy: tabs.technology.subtitle,
+        image: car.image,
+      },
+    ] satisfies Array<{
+      tab: JumpTab;
+      kicker: string;
+      title: string;
+      copy: string;
+      image: string;
+    }>
+  ).filter((item) => tabs[item.tab].visible && (item.title || item.copy));
 
   return (
     <div className="space-y-12">
@@ -97,7 +105,7 @@ export function CarDetailOverview({
             OVERVIEW
           </p>
           <h2 className="mt-2 text-[36px] font-bold leading-[1.15] tracking-tight text-[#0f172a] md:text-[42px]">
-            {tabs.overview.heading}
+            {tabs.overview.heading || tabs.overview.title}
           </h2>
         </div>
         <p className="lg:col-span-6 text-[15px] leading-7 text-[#64748b] lg:text-right">
@@ -151,38 +159,40 @@ export function CarDetailOverview({
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {journeys.map((item) => (
-          <button
-            key={item.tab}
-            type="button"
-            onClick={() => onOpenTab(item.tab)}
-            className="group overflow-hidden rounded-[22px] border border-[#eef2f6] bg-white text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
-          >
-            <div className="relative aspect-[16/10] overflow-hidden">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="(min-width: 1024px) 33vw, 100vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-              />
-            </div>
-            <div className="p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#94a3b8]">
-                {item.kicker}
-              </p>
-              <h3 className="mt-1 text-[18px] font-semibold text-[#0f172a]">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-[13px] leading-6 text-[#64748b]">{item.copy}</p>
-              <p className="mt-4 text-[13px] font-semibold text-[#0f172a]">
-                Дэлгэрэнгүй →
-              </p>
-            </div>
-          </button>
-        ))}
-      </div>
+        {journeys.length > 0 && (
+          <div className="grid gap-4 lg:grid-cols-3">
+            {journeys.map((item) => (
+              <button
+                key={item.tab}
+                type="button"
+                onClick={() => onOpenTab(item.tab)}
+                className="group overflow-hidden rounded-[22px] border border-[#eef2f6] bg-white text-left shadow-[0_8px_24px_rgba(15,23,42,0.04)]"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, 100vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <div className="p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#94a3b8]">
+                    {item.kicker}
+                  </p>
+                  <h3 className="mt-1 text-[18px] font-semibold text-[#0f172a]">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-[13px] leading-6 text-[#64748b]">{item.copy}</p>
+                  <p className="mt-4 text-[13px] font-semibold text-[#0f172a]">
+                    Дэлгэрэнгүй →
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
 
       <div className="grid items-stretch gap-6 lg:grid-cols-12">
         <div className="rounded-[28px] border border-[#eef2f6] bg-white p-7 shadow-[0_8px_24px_rgba(15,23,42,0.04)] lg:col-span-7">

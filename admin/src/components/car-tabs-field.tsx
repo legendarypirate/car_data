@@ -8,9 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   TAB_META,
+  specsFromCar,
   type CarTabs,
   type DetailItem,
   type GalleryItem,
+  type SpecGroup,
+  type SpecMetric,
   type TabId,
   type TextPair,
 } from "@/lib/car-tabs";
@@ -18,10 +21,12 @@ import {
 export function CarTabsField({
   tabs,
   gallery,
+  carInfo,
   onChange,
 }: {
   tabs: CarTabs;
   gallery: string[];
+  carInfo: Parameters<typeof specsFromCar>[0];
   onChange: (tabs: CarTabs) => void;
 }) {
   const [active, setActive] = useState<TabId>("overview");
@@ -155,7 +160,7 @@ export function CarTabsField({
         )}
 
         {active === "specs" && (
-          <div className="mt-3">
+          <div className="mt-3 space-y-4">
             <Field label="Оршил">
               <Textarea
                 rows={2}
@@ -163,6 +168,29 @@ export function CarTabsField({
                 onChange={(e) => patch("specs", { intro: e.target.value })}
               />
             </Field>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                Хоосон бол сайт дээр машины үндсэн үзүүлэлт харагдана.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  const next = specsFromCar(carInfo);
+                  patch("specs", { metrics: next.metrics, groups: next.groups });
+                }}
+              >
+                Үндсэн үзүүлэлтээс бөглөх
+              </Button>
+            </div>
+            <MetricsEditor
+              items={tabs.specs.metrics || []}
+              onChange={(metrics) => patch("specs", { metrics })}
+            />
+            <GroupsEditor
+              items={tabs.specs.groups || []}
+              onChange={(groups) => patch("specs", { groups })}
+            />
           </div>
         )}
 
@@ -386,6 +414,127 @@ function GalleryEditor({
         }
       >
         Зураг нэмэх
+      </Button>
+    </div>
+  );
+}
+
+function MetricsEditor({
+  items,
+  onChange,
+}: {
+  items: SpecMetric[];
+  onChange: (items: SpecMetric[]) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-medium text-muted-foreground">Дээд үзүүлэлтүүд</p>
+      {items.map((item, index) => (
+        <div key={index} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+          <Input
+            value={item.value}
+            onChange={(e) => {
+              const next = [...items];
+              next[index] = { ...item, value: e.target.value };
+              onChange(next);
+            }}
+            placeholder="Жишээ: 520 км"
+          />
+          <Input
+            value={item.label}
+            onChange={(e) => {
+              const next = [...items];
+              next[index] = { ...item, label: e.target.value };
+              onChange(next);
+            }}
+            placeholder="Жишээ: Явалтын цэнэг"
+          />
+          <Button type="button" variant="ghost" onClick={() => onChange(items.filter((_, i) => i !== index))}>
+            Устгах
+          </Button>
+        </div>
+      ))}
+      <Button type="button" variant="outline" onClick={() => onChange([...items, { value: "", label: "" }])}>
+        Үзүүлэлт нэмэх
+      </Button>
+    </div>
+  );
+}
+
+function GroupsEditor({
+  items,
+  onChange,
+}: {
+  items: SpecGroup[];
+  onChange: (items: SpecGroup[]) => void;
+}) {
+  function updateGroup(index: number, patch: Partial<SpecGroup>) {
+    const next = [...items];
+    next[index] = { ...items[index], ...patch };
+    onChange(next);
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs font-medium text-muted-foreground">Хүснэгтүүд</p>
+      {items.map((group, index) => (
+        <div key={index} className="space-y-2 rounded-xl border bg-white p-3">
+          <div className="flex items-center gap-2">
+            <Input
+              value={group.title}
+              onChange={(e) => updateGroup(index, { title: e.target.value })}
+              placeholder="Хэсгийн нэр"
+            />
+            <Button type="button" variant="ghost" onClick={() => onChange(items.filter((_, i) => i !== index))}>
+              Хэсэг устгах
+            </Button>
+          </div>
+          {(group.rows || []).map((row, rowIndex) => (
+            <div key={rowIndex} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+              <Input
+                value={row.label}
+                onChange={(e) => {
+                  const rows = [...(group.rows || [])];
+                  rows[rowIndex] = { ...row, label: e.target.value };
+                  updateGroup(index, { rows });
+                }}
+                placeholder="Нэр"
+              />
+              <Input
+                value={row.value}
+                onChange={(e) => {
+                  const rows = [...(group.rows || [])];
+                  rows[rowIndex] = { ...row, value: e.target.value };
+                  updateGroup(index, { rows });
+                }}
+                placeholder="Утга"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() =>
+                  updateGroup(index, { rows: (group.rows || []).filter((_, i) => i !== rowIndex) })
+                }
+              >
+                Устгах
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => updateGroup(index, { rows: [...(group.rows || []), { label: "", value: "" }] })}
+          >
+            Мөр нэмэх
+          </Button>
+        </div>
+      ))}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => onChange([...items, { title: "", rows: [{ label: "", value: "" }] }])}
+      >
+        Хэсэг нэмэх
       </Button>
     </div>
   );

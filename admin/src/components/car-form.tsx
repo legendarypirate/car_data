@@ -306,6 +306,20 @@ export function CarForm({ car }: { car?: Car }) {
           <CarTabsField
             tabs={form.tabs}
             gallery={form.gallery}
+            carInfo={{
+              year: Number(form.year),
+              type: form.type,
+              fuelType: form.fuelType,
+              drivetrain: form.drivetrain,
+              seats: Number(form.seats),
+              color: form.color,
+              powerKw: Number(form.powerKw),
+              acceleration: form.acceleration,
+              rangeKm: Number(form.rangeKm),
+              rangeLabel: form.rangeLabel,
+              batteryKwh: form.batteryKwh,
+              chargeMinutes: form.chargeMinutes,
+            }}
             onChange={(tabs) => update("tabs", tabs)}
           />
         </div>
