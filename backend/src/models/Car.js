@@ -9,6 +9,12 @@ const Car = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
+    uuid: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      unique: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
     slug: {
       type: DataTypes.STRING,
       allowNull: false,

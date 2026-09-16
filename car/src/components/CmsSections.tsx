@@ -145,7 +145,7 @@ function Section({
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {list.map((car) => (
-              <CarCard key={car.slug} car={car} />
+              <CarCard key={car.uuid || car.slug} car={car} />
             ))}
           </div>
         </div>

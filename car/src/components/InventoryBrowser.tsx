@@ -657,7 +657,7 @@ export function InventoryBrowser() {
               }`}
             >
               {paginatedCars.map((car) => (
-                <CarCard key={car.slug} car={car} />
+                <CarCard key={car.uuid || car.slug} car={car} />
               ))}
             </div>
           )}

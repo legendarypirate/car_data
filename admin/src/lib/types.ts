@@ -5,6 +5,7 @@ export type InquiryStatus = "new" | "contacted" | "closed";
 
 export type Car = {
   id: number;
+  uuid: string;
   slug: string;
   name: string;
   brand: string;

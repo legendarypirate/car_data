@@ -1,6 +1,10 @@
 import type { Car } from "@/data/cars";
 import { apiPath } from "@/lib/api-url";
 
+export function carHref(car: Pick<Car, "uuid" | "id" | "slug">) {
+  return `/inventory/${car.uuid || car.id || car.slug}`;
+}
+
 export async function getLiveCars(): Promise<Car[]> {
   try {
     const response = await fetch(apiPath("/api/cars"), { cache: "no-store" });
@@ -12,9 +16,9 @@ export async function getLiveCars(): Promise<Car[]> {
   }
 }
 
-export async function getLiveCar(slug: string): Promise<Car | undefined> {
+export async function getLiveCar(id: string): Promise<Car | undefined> {
   try {
-    const response = await fetch(apiPath(`/api/cars/${slug}`), { cache: "no-store" });
+    const response = await fetch(apiPath(`/api/cars/${id}`), { cache: "no-store" });
     if (!response.ok) return undefined;
     return (await response.json()) as Car;
   } catch {

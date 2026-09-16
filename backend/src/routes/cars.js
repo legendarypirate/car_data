@@ -4,6 +4,18 @@ const { Car } = require("../models");
 
 const router = Router();
 
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value),
+  );
+}
+
+function findCarByParam(id) {
+  if (isUuid(id)) return Car.findOne({ where: { uuid: id } });
+  if (/^\d+$/.test(String(id))) return Car.findByPk(id);
+  return Car.findOne({ where: { slug: id } });
+}
+
 function slugify(value) {
   return String(value)
     .toLowerCase()
@@ -123,9 +135,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const car = /^\d+$/.test(req.params.id)
-      ? await Car.findByPk(req.params.id)
-      : await Car.findOne({ where: { slug: req.params.id } });
+    const car = await findCarByParam(req.params.id);
     if (!car) {
       return res.status(404).json({ message: "Машин олдсонгүй" });
     }

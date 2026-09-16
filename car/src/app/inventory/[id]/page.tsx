@@ -4,12 +4,12 @@ import { CarDetailTabs } from "@/components/CarDetailTabs";
 import { getLiveCar, getLiveCars } from "@/lib/cars";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
-  const { slug } = await props.params;
-  const car = await getLiveCar(slug);
+  const { id } = await props.params;
+  const car = await getLiveCar(id);
   if (!car) return { title: "Машин | NDA AUTO" };
   return {
     title: `${car.brand} ${car.name} (${car.year}) | NDA AUTO`,
@@ -18,12 +18,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 }
 
 export default async function CarDetailPage(props: PageProps) {
-  const { slug } = await props.params;
-  const car = await getLiveCar(slug);
+  const { id } = await props.params;
+  const car = await getLiveCar(id);
   if (!car) notFound();
 
   const all = await getLiveCars();
-  const similar = all.filter((item) => item.slug !== car.slug).slice(0, 4);
+  const similar = all
+    .filter((item) => (item.uuid || item.slug) !== (car.uuid || car.slug))
+    .slice(0, 4);
 
   return (
     <main className="min-h-screen bg-white">

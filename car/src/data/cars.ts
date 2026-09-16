@@ -6,6 +6,8 @@ export type FuelType = "EV" | "HEV" | "Petrol" | "Diesel";
 export type DriveType = "2WD" | "AWD";
 
 export type Car = {
+  id?: number;
+  uuid?: string;
   slug: string;
   name: string;
   brand: "Toyota" | "BYD" | "Tesla" | "Zeekr" | "XPeng" | "AITO" | "Xiaomi" | "NIO" | string;

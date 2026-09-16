@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Car } from "@/data/cars";
+import { carHref } from "@/lib/cars";
 import { formatPrice } from "@/lib/format";
 import { BrandLogo } from "@/components/BrandLogo";
 
@@ -16,7 +17,7 @@ export function CarCard({ car }: { car: Car }) {
 
   return (
     <Link
-      href={`/inventory/${car.slug}`}
+      href={carHref(car)}
       className="group flex flex-col overflow-hidden rounded-2xl bg-white border border-[#e2e8f0] shadow-[0_2px_12px_rgba(0,0,0,0.03)] transition-all duration-300 hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] hover:-translate-y-1"
     >
       {/* Image Area */}

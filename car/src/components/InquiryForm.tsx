@@ -19,7 +19,7 @@ export function InquiryForm({ defaultCar }: { defaultCar?: string }) {
     () => cars.map((car) => `${car.brand} ${car.name}`),
     [cars],
   );
-  const defaultValue = cars.find((car) => car.slug === defaultCar);
+  const defaultValue = cars.find((car) => car.uuid === defaultCar || car.slug === defaultCar);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

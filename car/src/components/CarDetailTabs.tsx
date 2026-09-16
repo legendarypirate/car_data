@@ -724,7 +724,7 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {similar.map((item) => (
-              <CarCard key={item.slug} car={item} />
+              <CarCard key={item.uuid || item.slug} car={item} />
             ))}
           </div>
         </div>
