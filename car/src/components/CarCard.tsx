@@ -33,7 +33,7 @@ export function CarCard({ car }: { car: Car }) {
         )}
 
         <Image
-          src={car.image}
+          src={car.image || "/hero-bg.jpg"}
           alt={`${car.brand} ${car.name}`}
           fill
           sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"

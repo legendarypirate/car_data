@@ -2,11 +2,11 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fallbackBrands, fetchBrands } from "@/lib/brands";
+import { fetchBrands } from "@/lib/brands";
 
 export function HomeSearch() {
   const router = useRouter();
-  const [brands, setBrands] = useState(fallbackBrands);
+  const [brands, setBrands] = useState<{ id?: number; name: string }[]>([]);
 
   useEffect(() => {
     fetchBrands().then(setBrands);

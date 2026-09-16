@@ -168,5 +168,5 @@ export function blankSection(type: string): CmsSection {
 export function siteImage(path?: string) {
   if (!path) return "";
   if (path.startsWith("http")) return path;
-  return `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}${path}`;
+  return `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000"}${path}`;
 }

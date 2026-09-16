@@ -1,4 +1,3 @@
-import { brands as fallbackNames } from "@/data/cars";
 import { apiPath } from "@/lib/api-url";
 
 export type Brand = {
@@ -9,30 +8,24 @@ export type Brand = {
   carCount?: number;
 };
 
-export const fallbackBrands: Brand[] = fallbackNames.map((name, index) => ({
-  id: index + 1,
-  name,
-  slug: name.toLowerCase(),
-  image: "",
-  carCount: 0,
-}));
-
 export async function getBrands(): Promise<Brand[]> {
   try {
     const response = await fetch(apiPath("/api/brands"), { cache: "no-store" });
-    if (!response.ok) return fallbackBrands;
-    return (await response.json()) as Brand[];
+    if (!response.ok) return [];
+    const list = (await response.json()) as Brand[];
+    return Array.isArray(list) ? list : [];
   } catch {
-    return fallbackBrands;
+    return [];
   }
 }
 
 export async function fetchBrands(): Promise<Brand[]> {
   try {
     const response = await fetch(apiPath("/api/brands"));
-    if (!response.ok) return fallbackBrands;
-    return (await response.json()) as Brand[];
+    if (!response.ok) return [];
+    const list = (await response.json()) as Brand[];
+    return Array.isArray(list) ? list : [];
   } catch {
-    return fallbackBrands;
+    return [];
   }
 }

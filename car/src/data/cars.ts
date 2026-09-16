@@ -31,6 +31,7 @@ export type Car = {
   image: string;
   gallery: string[];
   bodyLabel?: string;
+  featured?: boolean;
   tabs?: CarTabs | Record<string, unknown>;
 };
 

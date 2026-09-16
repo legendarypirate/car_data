@@ -6,9 +6,10 @@ import { ContactSection } from "@/components/ContactSection";
 import { FinancingSection } from "@/components/FinancingSection";
 import { InventoryBrowser } from "@/components/InventoryBrowser";
 import { SectionIcon } from "@/components/SectionIcon";
-import { getFeaturedCars } from "@/data/cars";
 import { getBrands, type Brand } from "@/lib/brands";
+import { getLiveCars } from "@/lib/cars";
 import type { CmsSection } from "@/lib/cms";
+import type { Car } from "@/data/cars";
 
 export async function CmsSections({
   sections,
@@ -17,13 +18,19 @@ export async function CmsSections({
   sections: CmsSection[];
   defaultCar?: string;
 }) {
-  const brands = await getBrands();
+  const [brands, liveCars] = await Promise.all([getBrands(), getLiveCars()]);
   return (
     <main>
       {sections
         .filter((section) => section.visible !== false)
         .map((section) => (
-          <Section key={section.id} section={section} defaultCar={defaultCar} brands={brands} />
+          <Section
+            key={section.id}
+            section={section}
+            defaultCar={defaultCar}
+            brands={brands}
+            liveCars={liveCars}
+          />
         ))}
     </main>
   );
@@ -41,10 +48,12 @@ function Section({
   section,
   defaultCar,
   brands,
+  liveCars,
 }: {
   section: CmsSection;
   defaultCar?: string;
   brands: Brand[];
+  liveCars: Car[];
 }) {
   if (section.type === "hero") {
     return (
@@ -114,7 +123,9 @@ function Section({
   }
 
   if (section.type === "featuredCars") {
-    const featured = getFeaturedCars();
+    const featured = liveCars.filter((car) => car.featured).slice(0, 4);
+    const list = featured.length ? featured : liveCars.slice(0, 4);
+    if (!list.length) return null;
     return (
       <section className="bg-canvas">
         <div className="mx-auto max-w-[1280px] px-6 py-16">
@@ -133,7 +144,7 @@ function Section({
             </Link>
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((car) => (
+            {list.map((car) => (
               <CarCard key={car.slug} car={car} />
             ))}
           </div>
@@ -143,9 +154,8 @@ function Section({
   }
 
   if (section.type === "brandRow") {
-    const names = brands.length
-      ? brands.map((brand) => brand.name)
-      : (section.names as string[]) || [];
+    const names = brands.map((brand) => brand.name);
+    if (!names.length) return null;
     return (
       <section className="border-y border-line bg-white">
         <div className="mx-auto max-w-[1280px] px-6 py-10">
@@ -474,14 +484,13 @@ function Section({
   }
 
   if (section.type === "brandCards") {
-    const items = brands.length
-      ? brands.map((brand) => ({
-          name: brand.name,
-          count: `${brand.carCount ?? 0} загвар`,
-          image: brand.image || "/hero-bg.jpg",
-          href: `/inventory?brand=${encodeURIComponent(brand.name)}`,
-        }))
-      : (section.items as { name: string; count: string; image: string; href: string }[]) || [];
+    const items = brands.map((brand) => ({
+      name: brand.name,
+      count: `${brand.carCount ?? 0} загвар`,
+      image: brand.image || "/hero-bg.jpg",
+      href: `/inventory?brand=${encodeURIComponent(brand.name)}`,
+    }));
+    if (!items.length) return null;
     return (
       <section className="bg-[#f8fafc]">
         <div className="mx-auto grid max-w-[1400px] gap-5 px-6 py-10 sm:grid-cols-2 lg:grid-cols-3">

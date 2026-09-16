@@ -10,15 +10,34 @@ const cmsRouter = require("./routes/cms");
 const brandsRouter = require("./routes/brands");
 const { router: uploadsRouter, uploadDir } = require("./routes/uploads");
 
-const app = express();
-const port = Number(process.env.PORT) || 4000;
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000,http://localhost:3001")
+const port = Number(process.env.PORT) || 4001;
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:4000,http://localhost:4002")
   .split(",")
-  .map((origin) => origin.trim());
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
+function isAllowedOrigin(origin = "") {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === "teensclub.mn" || hostname.endsWith(".teensclub.mn");
+  } catch {
+    return false;
+  }
+}
+
+const app = express();
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error("CORS blocked"));
+    },
+    credentials: true,
   }),
 );
 app.use(express.json({ limit: "2mb" }));

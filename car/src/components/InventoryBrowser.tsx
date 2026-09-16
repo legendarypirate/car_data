@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CarCard } from "@/components/CarCard";
-import { cars, type BodyType, type Car } from "@/data/cars";
-import { fallbackBrands, fetchBrands, type Brand } from "@/lib/brands";
+import { fetchBrands, type Brand } from "@/lib/brands";
+import { fetchCars } from "@/lib/cars";
+import { type Car } from "@/data/cars";
 
 const categories = [
   { id: "all", label: "Бүх машин", icon: "all" },
@@ -31,12 +32,21 @@ export function InventoryBrowser() {
   const [sortBy, setSortBy] = useState<string>("newest");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [brands, setBrands] = useState<Brand[]>(fallbackBrands);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [cars, setCars] = useState<Car[]>([]);
   const itemsPerPage = 8;
 
   useEffect(() => {
-    fetchBrands().then(setBrands);
+    Promise.all([fetchBrands(), fetchCars()]).then(([nextBrands, nextCars]) => {
+      setBrands(nextBrands);
+      setCars(nextCars);
+    });
   }, []);
+
+  useEffect(() => {
+    const brand = params.get("brand");
+    if (brand) setSelectedBrands([brand]);
+  }, [params]);
 
   // Toggle brand selection
   const toggleBrand = (brand: string) => {
@@ -133,6 +143,7 @@ export function InventoryBrowser() {
     maxPrice,
     selectedFuels,
     selectedDrivetrains,
+    cars,
   ]);
 
   // Sorted cars
@@ -164,7 +175,7 @@ export function InventoryBrowser() {
       counts[b.name] = b.carCount ?? cars.filter((c) => c.brand === b.name).length;
     });
     return counts;
-  }, [brands]);
+  }, [brands, cars]);
 
   return (
     <div className="w-full">
@@ -609,7 +620,7 @@ export function InventoryBrowser() {
           </div>
 
           {/* Cars Grid / List */}
-          {sortedCars.length === 0 ? (
+          {cars.length === 0 ? null : sortedCars.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white py-16 px-6 text-center">
               <svg
                 width="40"

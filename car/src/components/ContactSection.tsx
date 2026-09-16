@@ -1,9 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cars } from "@/data/cars";
+import { fetchCars } from "@/lib/cars";
+import type { Car } from "@/data/cars";
 
 interface ContactSectionProps {
   defaultCar?: string;
@@ -45,9 +46,14 @@ export function ContactSection({ defaultCar }: ContactSectionProps) {
   const [message, setMessage] = useState("");
   const [agree, setAgree] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [cars, setCars] = useState<Car[]>([]);
 
   // FAQ Accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchCars().then(setCars);
+  }, []);
 
   const toggleFaq = (id: number) => {
     setOpenFaq((prev) => (prev === id ? null : id));

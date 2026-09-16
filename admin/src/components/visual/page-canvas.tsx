@@ -32,7 +32,7 @@ export function PageCanvas({
         <span className="size-2.5 rounded-full bg-[#febc2e]" />
         <span className="size-2.5 rounded-full bg-[#28c840]" />
         <div className="ml-3 flex-1 rounded-full bg-white px-4 py-1 text-center text-[12px] text-[#6b7280] ring-1 ring-black/5">
-          localhost:3000{path}
+          localhost:4000{path}
         </div>
       </div>
       <PublicPage

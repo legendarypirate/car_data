@@ -1,15 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CarDetailTabs } from "@/components/CarDetailTabs";
-import { cars } from "@/data/cars";
 import { getLiveCar, getLiveCars } from "@/lib/cars";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
-}
-
-export function generateStaticParams() {
-  return cars.map((car) => ({ slug: car.slug }));
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {

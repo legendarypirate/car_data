@@ -1,16 +1,23 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { cars } from "@/data/cars";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { fetchCars } from "@/lib/cars";
+import type { Car } from "@/data/cars";
 
 const field =
   "h-11 rounded-lg border border-line bg-white px-3 text-sm outline-none ring-brand/25 focus:border-brand focus:ring-2";
 
 export function InquiryForm({ defaultCar }: { defaultCar?: string }) {
   const [sent, setSent] = useState(false);
+  const [cars, setCars] = useState<Car[]>([]);
+
+  useEffect(() => {
+    fetchCars().then(setCars);
+  }, []);
+
   const options = useMemo(
     () => cars.map((car) => `${car.brand} ${car.name}`),
-    [],
+    [cars],
   );
   const defaultValue = cars.find((car) => car.slug === defaultCar);
 
@@ -54,10 +61,11 @@ export function InquiryForm({ defaultCar }: { defaultCar?: string }) {
           defaultValue={
             defaultValue
               ? `${defaultValue.brand} ${defaultValue.name}`
-              : options[0]
+              : options[0] || ""
           }
           className={field}
         >
+          {options.length === 0 && <option value="">Машин алга</option>}
           {options.map((option) => (
             <option key={option}>{option}</option>
           ))}

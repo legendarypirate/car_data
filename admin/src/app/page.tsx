@@ -48,7 +48,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {error && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Статистик ачаалж чадсангүй. Backend 4000 порт дээр ажиллаж байна уу? {error}
+          Статистик ачаалж чадсангүй. Backend 4001 порт дээр ажиллаж байна уу? {error}
         </div>
       )}
 

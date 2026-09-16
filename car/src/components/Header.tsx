@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { HeaderCms } from "@/lib/cms";
+import { apiPath } from "@/lib/api-url";
+import type { FooterCms, HeaderCms } from "@/lib/cms";
 
 const fallback: HeaderCms = {
   brand: "NDA AUTO",
@@ -24,7 +26,16 @@ const fallback: HeaderCms = {
 
 export function Header({ data }: { data?: HeaderCms | null }) {
   const pathname = usePathname();
-  const header = data || fallback;
+  const [header, setHeader] = useState<HeaderCms>(data || fallback);
+
+  useEffect(() => {
+    fetch(apiPath("/api/cms/chrome"))
+      .then((response) => (response.ok ? response.json() : null))
+      .then((json: { header?: HeaderCms; footer?: FooterCms } | null) => {
+        if (json?.header) setHeader(json.header);
+      })
+      .catch(() => undefined);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 bg-[#0c121d] backdrop-blur-md border-b border-white/5">

@@ -1,29 +1,44 @@
+const PRODUCTION_API = "https://carapi.teensclub.mn";
+const LOCAL_API = "http://localhost:4001";
+
 declare global {
   interface Window {
     __NDA_API_URL__?: string;
   }
 }
 
-function readEnv(key: string) {
-  if (typeof process === "undefined" || !process.env) return "";
-  return process.env[key]?.trim() || "";
+function strip(url: string) {
+  return url.trim().replace(/\/$/, "");
+}
+
+function isLocalHostName(host: string) {
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host.endsWith(".local") ||
+    /^\d+\.\d+\.\d+\.\d+$/.test(host)
+  );
 }
 
 export function getApiUrl() {
-  if (typeof window !== "undefined" && window.__NDA_API_URL__) {
-    return window.__NDA_API_URL__.replace(/\/$/, "");
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (isLocalHostName(host)) return LOCAL_API;
+    if (host.includes("teensclub.mn")) return PRODUCTION_API;
+    return LOCAL_API;
   }
 
-  const url =
-    readEnv("API_URL") ||
-    readEnv("NEXT_PUBLIC_API_URL") ||
-    "http://localhost:4001";
+  const fromEnv = strip(
+    process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || "",
+  );
+  if (fromEnv) return fromEnv;
 
-  return url.replace(/\/$/, "");
+  if (process.env.NODE_ENV === "production") return PRODUCTION_API;
+  return LOCAL_API;
 }
 
 export function apiPath(path: string) {
-  const prefix = getApiUrl();
   const suffix = path.startsWith("/") ? path : `/${path}`;
-  return `${prefix}${suffix}`;
+  return `${getApiUrl()}${suffix}`;
 }

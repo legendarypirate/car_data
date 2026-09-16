@@ -79,7 +79,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </h1>
               </div>
               <a
-                href="http://localhost:3000"
+                href="http://localhost:4000"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-full bg-[#0c121d] px-3 py-1 text-xs font-medium text-white"

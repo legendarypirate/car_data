@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { cars } from "@/data/cars";
 import { formatAmount, parseAmount } from "@/lib/format";
+import { fetchCars } from "@/lib/cars";
+import type { Car } from "@/data/cars";
 
 const partnerBanks = [
   { name: "ХААН БАНК", color: "#166534", symbol: "🟢" },
@@ -38,14 +39,24 @@ const faqs = [
 ];
 
 export function FinancingSection() {
-  // Calculator state
-  const [selectedCarSlug, setSelectedCarSlug] = useState("toyota-bz3x");
-  const [customPrice, setCustomPrice] = useState<number>(128900000);
+  const [cars, setCars] = useState<Car[]>([]);
+  const [selectedCarSlug, setSelectedCarSlug] = useState("");
+  const [customPrice, setCustomPrice] = useState<number>(0);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
   const [termMonths, setTermMonths] = useState<number>(36);
 
   // FAQ Accordion State
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchCars().then((list) => {
+      setCars(list);
+      if (list[0]) {
+        setSelectedCarSlug(list[0].slug);
+        setCustomPrice(list[0].price);
+      }
+    });
+  }, []);
 
   // Handle Car Select
   const handleCarChange = (slug: string) => {
