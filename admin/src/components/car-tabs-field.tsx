@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,13 +115,12 @@ export function CarTabsField({
 
         {active === "interior" && (
           <div className="mt-3 space-y-3">
-            <Field label="Интерьер баннер зураг">
-              <Input
-                value={tabs.interior.heroImage}
-                onChange={(e) => patch("interior", { heroImage: e.target.value })}
-                placeholder="https://... эсвэл /uploads/..."
-              />
-            </Field>
+            <ImageUploadField
+              label="Интерьер баннер зураг"
+              hint="Файл сонгож хуулна."
+              value={tabs.interior.heroImage}
+              onChange={(heroImage) => patch("interior", { heroImage })}
+            />
             <PairsEditor
               items={tabs.interior.features}
               onChange={(features) => patch("interior", { features })}
@@ -244,41 +244,43 @@ function DetailsEditor({
     <div className="space-y-2">
       <p className="text-xs font-medium text-muted-foreground">Дэлгэрэнгүй зураг</p>
       {items.map((item, index) => (
-        <div key={index} className="grid gap-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
-          <Input
+        <div key={index} className="space-y-2 rounded-xl border bg-white p-3">
+          <ImageUploadField
+            compact
             value={item.image}
-            onChange={(e) => {
+            onChange={(image) => {
               const next = [...items];
-              next[index] = { ...item, image: e.target.value };
+              next[index] = { ...item, image };
               onChange(next);
             }}
-            placeholder="Зургийн холбоос"
           />
-          <Input
-            value={item.title}
-            onChange={(e) => {
-              const next = [...items];
-              next[index] = { ...item, title: e.target.value };
-              onChange(next);
-            }}
-            placeholder="Гарчиг"
-          />
-          <Input
-            value={item.sub}
-            onChange={(e) => {
-              const next = [...items];
-              next[index] = { ...item, sub: e.target.value };
-              onChange(next);
-            }}
-            placeholder="Тайлбар"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => onChange(items.filter((_, i) => i !== index))}
-          >
-            Устгах
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+            <Input
+              value={item.title}
+              onChange={(e) => {
+                const next = [...items];
+                next[index] = { ...item, title: e.target.value };
+                onChange(next);
+              }}
+              placeholder="Гарчиг"
+            />
+            <Input
+              value={item.sub}
+              onChange={(e) => {
+                const next = [...items];
+                next[index] = { ...item, sub: e.target.value };
+                onChange(next);
+              }}
+              placeholder="Тайлбар"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onChange(items.filter((_, i) => i !== index))}
+            >
+              Устгах
+            </Button>
+          </div>
         </div>
       ))}
       <Button
@@ -323,55 +325,57 @@ function GalleryEditor({
         </Button>
       </div>
       {items.map((item, index) => (
-        <div key={index} className="grid gap-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1fr_auto]">
-          <Input
+        <div key={index} className="space-y-2 rounded-xl border bg-white p-3">
+          <ImageUploadField
+            compact
             value={item.image}
-            onChange={(e) => {
+            onChange={(image) => {
               const next = [...items];
-              next[index] = { ...item, image: e.target.value };
+              next[index] = { ...item, image };
               onChange(next);
             }}
-            placeholder="Зургийн холбоос"
           />
-          <Input
-            value={item.tag}
-            onChange={(e) => {
-              const next = [...items];
-              next[index] = { ...item, tag: e.target.value };
-              onChange(next);
-            }}
-            placeholder="Шошго"
-          />
-          <select
-            className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
-            value={item.category}
-            onChange={(e) => {
-              const next = [...items];
-              next[index] = { ...item, category: e.target.value };
-              onChange(next);
-            }}
-          >
-            <option value="exterior">Экстерьер</option>
-            <option value="interior">Интерьер</option>
-            <option value="detail">Деталь</option>
-            <option value="lifestyle">Амьдралын хэв маяг</option>
-          </select>
-          <Input
-            value={item.caption}
-            onChange={(e) => {
-              const next = [...items];
-              next[index] = { ...item, caption: e.target.value };
-              onChange(next);
-            }}
-            placeholder="Тайлбар"
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => onChange(items.filter((_, i) => i !== index))}
-          >
-            Устгах
-          </Button>
+          <div className="grid gap-2 lg:grid-cols-[0.8fr_0.8fr_1fr_auto]">
+            <Input
+              value={item.tag}
+              onChange={(e) => {
+                const next = [...items];
+                next[index] = { ...item, tag: e.target.value };
+                onChange(next);
+              }}
+              placeholder="Шошго"
+            />
+            <select
+              className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm"
+              value={item.category}
+              onChange={(e) => {
+                const next = [...items];
+                next[index] = { ...item, category: e.target.value };
+                onChange(next);
+              }}
+            >
+              <option value="exterior">Экстерьер</option>
+              <option value="interior">Интерьер</option>
+              <option value="detail">Деталь</option>
+              <option value="lifestyle">Амьдралын хэв маяг</option>
+            </select>
+            <Input
+              value={item.caption}
+              onChange={(e) => {
+                const next = [...items];
+                next[index] = { ...item, caption: e.target.value };
+                onChange(next);
+              }}
+              placeholder="Тайлбар"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onChange(items.filter((_, i) => i !== index))}
+            >
+              Устгах
+            </Button>
+          </div>
         </div>
       ))}
       <Button

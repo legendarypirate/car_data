@@ -4,9 +4,7 @@ import { useRef, useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { imageSrc } from "@/lib/api";
-import { canUploadToCloudinary, parseImageUrls, uploadToCloudinary } from "@/lib/cloudinary";
+import { imageSrc, uploadFiles } from "@/lib/api";
 
 export function BrandImageField({
   value,
@@ -16,31 +14,20 @@ export function BrandImageField({
   onChange: (image: string) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [url, setUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-  const cloudinaryReady = canUploadToCloudinary();
-
-  function apply(paths: string[]) {
-    const next = paths[0] || "";
-    if (!next) {
-      toast.error("Зургийн холбоос оруулна уу");
-      return;
-    }
-    onChange(next);
-    setUrl("");
-  }
 
   async function onUpload(files: FileList | null) {
     if (!files?.length) return;
     setUploading(true);
     try {
-      const urls = await uploadToCloudinary(files);
+      const urls = await uploadFiles(files);
       onChange(urls[0] || "");
       toast.success("Зураг хууллаа");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Зураг хуулж чадсангүй");
     } finally {
       setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   }
 
@@ -49,28 +36,19 @@ export function BrandImageField({
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold">Брэндийн зураг</h3>
-          <p className="text-xs text-muted-foreground">
-            Зургийн холбоос оруулах эсвэл Cloudinary-аас хуулна.
-          </p>
+          <p className="text-xs text-muted-foreground">Файл сонгож хуулна.</p>
         </div>
-        {cloudinaryReady && (
-          <>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                onUpload(e.target.files);
-                e.target.value = "";
-              }}
-            />
-            <Button type="button" variant="outline" disabled={uploading} onClick={() => inputRef.current?.click()}>
-              <Upload className="size-4" />
-              {uploading ? "Хуулж байна..." : "Зураг хуулах"}
-            </Button>
-          </>
-        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => onUpload(e.target.files)}
+        />
+        <Button type="button" variant="outline" disabled={uploading} onClick={() => inputRef.current?.click()}>
+          <Upload className="size-4" />
+          {uploading ? "Хуулж байна..." : "Файл хуулах"}
+        </Button>
       </div>
 
       {value ? (
@@ -90,17 +68,6 @@ export function BrandImageField({
           Брэндийн зураг алга
         </div>
       )}
-
-      <div className="flex gap-2">
-        <Input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://res.cloudinary.com/your-cloud/image/upload/v123/brand.jpg"
-        />
-        <Button type="button" onClick={() => apply(parseImageUrls(url))}>
-          Холбоос нэмэх
-        </Button>
-      </div>
     </section>
   );
 }

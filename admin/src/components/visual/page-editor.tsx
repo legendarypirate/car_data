@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { api } from "@/lib/api";
 import {
   blankSection,
@@ -220,16 +221,30 @@ function SectionFields({
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        Текстийг хуудас дээр засна. Энд холбоос, зураг оруулна.
+        Текстийг хуудас дээр засна. Зургийг файл хуулж оруулна.
       </p>
-      {["image", "leftImage", "primaryHref", "ctaHref", "leftHref", "rightHref"].map((key) =>
+      {section.image !== undefined && (
+        <ImageUploadField
+          label="Зураг"
+          hint="Файл сонгож хуулна."
+          value={text("image")}
+          onChange={(image) => onChange({ image })}
+        />
+      )}
+      {section.leftImage !== undefined && (
+        <ImageUploadField
+          label="Зүүн зураг"
+          hint="Файл сонгож хуулна."
+          value={text("leftImage")}
+          onChange={(leftImage) => onChange({ leftImage })}
+        />
+      )}
+      {["primaryHref", "ctaHref", "leftHref", "rightHref"].map((key) =>
         section[key] !== undefined ? (
           <Field
             key={key}
             label={
               {
-                image: "Зураг",
-                leftImage: "Зүүн зураг",
                 primaryHref: "Үндсэн холбоос",
                 ctaHref: "Товчны холбоос",
                 leftHref: "Зүүн холбоос",
@@ -265,38 +280,42 @@ function SectionFields({
       )}
       {section.type === "team" &&
         ((section.photos as { src: string; alt?: string }[]) || []).map((photo, index) => (
-          <Field key={index} label={`${index + 1}-р зураг`}>
-            <Input
-              value={photo.src}
-              onChange={(e) => {
-                const photos = [...((section.photos as { src: string; alt?: string }[]) || [])];
-                photos[index] = { ...photo, src: e.target.value };
-                onChange({ photos });
-              }}
-            />
-          </Field>
+          <ImageUploadField
+            key={index}
+            label={`${index + 1}-р зураг`}
+            hint="Файл сонгож хуулна."
+            value={photo.src}
+            onChange={(src) => {
+              const photos = [...((section.photos as { src: string; alt?: string }[]) || [])];
+              photos[index] = { ...photo, src };
+              onChange({ photos });
+            }}
+          />
         ))}
       {section.type === "brandCards" &&
         ((section.items as { name: string; image: string; href: string; count: string }[]) || []).map((item, index) => (
-          <Field key={index} label={`${item.name} зураг / холбоос`}>
-            <Input
-              className="mb-2"
+          <div key={index} className="space-y-2">
+            <ImageUploadField
+              label={`${item.name} зураг`}
+              hint="Файл сонгож хуулна."
               value={item.image}
-              onChange={(e) => {
+              onChange={(image) => {
                 const items = [...((section.items as object[]) || [])];
-                items[index] = { ...item, image: e.target.value };
+                items[index] = { ...item, image };
                 onChange({ items });
               }}
             />
-            <Input
-              value={item.href}
-              onChange={(e) => {
-                const items = [...((section.items as object[]) || [])];
-                items[index] = { ...item, href: e.target.value };
-                onChange({ items });
-              }}
-            />
-          </Field>
+            <Field label={`${item.name} холбоос`}>
+              <Input
+                value={item.href}
+                onChange={(e) => {
+                  const items = [...((section.items as object[]) || [])];
+                  items[index] = { ...item, href: e.target.value };
+                  onChange({ items });
+                }}
+              />
+            </Field>
+          </div>
         ))}
     </div>
   );

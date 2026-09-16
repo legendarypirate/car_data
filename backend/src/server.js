@@ -56,6 +56,9 @@ app.use("/api/uploads", uploadsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error(err);
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({ message: "Зураг 8MB-аас бага байх ёстой" });
+  }
   const status = err.name === "SequelizeUniqueConstraintError" ? 409 : 500;
   res.status(status).json({
     message: err.message || "Дотоод алдаа гарлаа",

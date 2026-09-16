@@ -4,9 +4,7 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Star, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { imageSrc, uploadFiles } from "@/lib/api";
-import { canUploadToCloudinary, parseImageUrls, uploadToCloudinary } from "@/lib/cloudinary";
 
 export function CarGalleryField({
   cover,
@@ -18,11 +16,9 @@ export function CarGalleryField({
   onChange: (next: { image: string; gallery: string[] }) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [urls, setUrls] = useState("");
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const images = Array.from(new Set([cover, ...gallery].filter(Boolean)));
-  const cloudinaryReady = canUploadToCloudinary();
 
   function commit(nextImages: string[], nextCover = nextImages[0] || "") {
     onChange({ image: nextCover, gallery: nextImages });
@@ -33,25 +29,13 @@ export function CarGalleryField({
     commit(next, cover && next.includes(cover) ? cover : next[0] || "");
   }
 
-  function addFromText() {
-    const parsed = parseImageUrls(urls);
-    if (!parsed.length) {
-      toast.error("Зургийн холбоос эсвэл замыг оруулна уу");
-      return;
-    }
-    addPaths(parsed);
-    setUrls("");
-  }
-
   async function onUpload(files: FileList | File[] | null) {
     if (!files || !("length" in files) || !files.length) return;
     setUploading(true);
     try {
-      const uploaded = cloudinaryReady
-        ? await uploadToCloudinary(files)
-        : await uploadFiles(files);
+      const uploaded = await uploadFiles(files);
       addPaths(uploaded);
-      toast.success(cloudinaryReady ? "Cloudinary-д хууллаа" : `${uploaded.length} зураг нэмэгдлээ`);
+      toast.success(`${uploaded.length} зураг нэмэгдлээ`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Хуулж чадсангүй");
     } finally {
@@ -168,23 +152,12 @@ export function CarGalleryField({
         </div>
       )}
 
-      <div className="grid gap-2">
-        <Textarea
-          rows={2}
-          value={urls}
-          onChange={(e) => setUrls(e.target.value)}
-          placeholder="Эсвэл зургийн холбоосыг мөр бүрээр оруулна уу"
-        />
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-muted-foreground">
-            {images.length} зураг
-            {cover ? " · нүүр зураг сонгосон" : ""}
-          </p>
-          <Button type="button" variant="outline" onClick={addFromText}>
-            Холбоос нэмэх
-          </Button>
-        </div>
-      </div>
+      {images.length > 0 && (
+        <p className="text-xs text-muted-foreground">
+          {images.length} зураг
+          {cover ? " · нүүр зураг сонгосон" : ""}
+        </p>
+      )}
     </section>
   );
 }
