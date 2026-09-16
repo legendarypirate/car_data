@@ -74,6 +74,7 @@ export function blankSection(type: string): CmsSection {
         primaryLabel: "Машинууд",
         primaryHref: "/inventory",
         secondaryLabel: "Бидний тухай",
+        secondaryHref: "/about",
         badgeEyebrow: "Цахилгаан",
         badgeLine: "Шинэ SUV",
         badgeBrand: "БРЭНД",

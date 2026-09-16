@@ -80,7 +80,7 @@ function Section({
                   {text(section, "primaryLabel")}
                 </Link>
                 {text(section, "secondaryLabel") && (
-                  <Link href="/about" className="text-[14px] text-white/70 hover:text-white">
+                  <Link href={text(section, "secondaryHref") || "/about"} className="text-[14px] text-white/70 hover:text-white">
                     {text(section, "secondaryLabel")}
                   </Link>
                 )}

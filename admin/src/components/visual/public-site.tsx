@@ -1,8 +1,9 @@
 "use client";
 
 import { formatPrice, imageSrc } from "@/lib/api";
-import type { Car } from "@/lib/types";
+import type { Brand, Car } from "@/lib/types";
 import type { CmsSection, FooterCms, HeaderCms } from "@/lib/cms";
+import { ChangeImageButton, EditableImage } from "./editable-image";
 import { Editable } from "./editable-text";
 
 export function PublicHeader({
@@ -211,9 +212,22 @@ export function PublicFooter({
               </>
             )}
             <div className="mt-3 flex flex-wrap gap-3 text-[12px] text-white/70">
-              {footer.socials.map((social) => (
-                <span key={social.name}>{social.name}</span>
-              ))}
+              {footer.socials.map((social, index) =>
+                editable ? (
+                  <Editable
+                    key={`${social.name}-${index}`}
+                    value={social.name}
+                    onChange={(name) => {
+                      const socials = footer.socials.map((item, i) =>
+                        i === index ? { ...item, name } : item,
+                      );
+                      set({ socials });
+                    }}
+                  />
+                ) : (
+                  <span key={`${social.name}-${index}`}>{social.name}</span>
+                ),
+              )}
             </div>
           </div>
 
@@ -281,6 +295,7 @@ function patch(
 export function PublicSection({
   section,
   cars,
+  brands = [],
   selected,
   editable,
   onSelect,
@@ -288,6 +303,7 @@ export function PublicSection({
 }: {
   section: CmsSection;
   cars: Car[];
+  brands?: Brand[];
   selected?: boolean;
   editable?: boolean;
   onSelect?: () => void;
@@ -295,6 +311,9 @@ export function PublicSection({
 }) {
   const value = (key: string) => String(section[key] ?? "");
   const set = (key: string, next: string) => patch(section, onChange, { [key]: next });
+  const brandNames = brands.length
+    ? brands.map((brand) => brand.name)
+    : ((section.names as string[]) || []);
 
   return (
     <div
@@ -308,12 +327,27 @@ export function PublicSection({
       )}
       {section.type === "hero" && (
         <section className="relative isolate min-h-[600px] overflow-hidden bg-[#0a0f1a] lg:min-h-[680px]">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-50"
-            style={{ backgroundImage: `url(${imageSrc(value("image") || "/hero-bg.jpg")})` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1a]/90 via-[#0a0f1a]/70 to-[#0a0f1a]/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-transparent to-transparent" />
+          {editable ? (
+            <EditableImage
+              src={imageSrc(value("image") || "/hero-bg.jpg")}
+              onChange={(image) => set("image", image)}
+              className="absolute inset-0"
+              imgClassName="opacity-50"
+              showButton={false}
+            />
+          ) : (
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-50"
+              style={{ backgroundImage: `url(${imageSrc(value("image") || "/hero-bg.jpg")})` }}
+            />
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0a0f1a]/90 via-[#0a0f1a]/70 to-[#0a0f1a]/40" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0f1a] via-transparent to-transparent" />
+          {editable && (
+            <div className="absolute top-4 right-4 z-40">
+              <ChangeImageButton onChange={(image) => set("image", image)} />
+            </div>
+          )}
           <div className="relative mx-auto max-w-[1280px] px-6 py-20 lg:py-28">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
@@ -463,6 +497,11 @@ export function PublicSection({
                 </article>
               ))}
             </div>
+            {editable && (
+              <p className="mt-4 text-[11px] font-medium tracking-wide text-[#94a3b8] uppercase">
+                Машины карт — CRUD өгөгдөл, энд засахгүй
+              </p>
+            )}
           </div>
         </section>
       )}
@@ -476,22 +515,9 @@ export function PublicSection({
               <p className="mb-6 text-[11px] font-semibold tracking-[0.15em] text-[#6b7280] uppercase">{value("eyebrow")}</p>
             )}
             <div className="flex flex-wrap items-center justify-between gap-8">
-              {((section.names as string[]) || []).map((name, index) =>
-                editable ? (
-                  <Editable
-                    key={index}
-                    value={name}
-                    onChange={(next) => {
-                      const names = [...((section.names as string[]) || [])];
-                      names[index] = next;
-                      onChange?.({ names });
-                    }}
-                    className="text-lg font-bold text-[#1a1a2e]/60"
-                  />
-                ) : (
-                  <span key={name} className="text-lg font-bold text-[#1a1a2e]/60">{name}</span>
-                ),
-              )}
+              {brandNames.map((name) => (
+                <span key={name} className="text-lg font-bold text-[#1a1a2e]/60">{name}</span>
+              ))}
               <span className="text-[13px] font-medium text-[#6b7280]">
                 {editable ? (
                   <Editable value={value("ctaLabel")} onChange={(ctaLabel) => set("ctaLabel", ctaLabel)} />
@@ -500,6 +526,11 @@ export function PublicSection({
                 )}
               </span>
             </div>
+            {editable && (
+              <p className="mt-4 text-[11px] font-medium tracking-wide text-[#94a3b8] uppercase">
+                Брэндийн нэрс — CRUD өгөгдөл, энд засахгүй
+              </p>
+            )}
           </div>
         </section>
       )}
@@ -509,12 +540,26 @@ export function PublicSection({
           <div className="mx-auto max-w-[1280px] px-6 py-16">
             <div className="grid gap-6 lg:grid-cols-2">
               <div className="relative min-h-[420px] overflow-hidden rounded-2xl">
-                <div
-                  className="absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${imageSrc(value("leftImage") || "/cta-scenic.jpg")})` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 p-8 text-white">
+                {editable ? (
+                  <EditableImage
+                    src={imageSrc(value("leftImage") || "/cta-scenic.jpg")}
+                    onChange={(leftImage) => set("leftImage", leftImage)}
+                    className="absolute inset-0"
+                    showButton={false}
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${imageSrc(value("leftImage") || "/cta-scenic.jpg")})` }}
+                  />
+                )}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                {editable && (
+                  <div className="absolute top-4 right-4 z-40">
+                    <ChangeImageButton onChange={(leftImage) => set("leftImage", leftImage)} />
+                  </div>
+                )}
+                <div className="absolute bottom-0 z-10 p-8 text-white">
                   {editable ? (
                     <>
                       <Editable as="h3" value={value("leftTitle")} onChange={(leftTitle) => set("leftTitle", leftTitle)} className="block text-2xl font-bold whitespace-pre-line lg:text-3xl" />
@@ -594,11 +639,26 @@ export function PublicSection({
 
       {section.type === "pageHero" && (
         <section className={`relative overflow-hidden bg-[#0c121d] text-white ${value("variant") === "cinema" ? "min-h-[360px] py-24" : "py-12 md:py-16"}`}>
-          <div
-            className={`absolute inset-0 bg-cover bg-center ${value("variant") === "cinema" ? "opacity-55" : "opacity-40"}`}
-            style={{ backgroundImage: `url(${imageSrc(value("image") || "/hero-bg.jpg")})` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0c121d] via-[#0c121d]/80 to-transparent" />
+          {editable ? (
+            <EditableImage
+              src={imageSrc(value("image") || "/hero-bg.jpg")}
+              onChange={(image) => set("image", image)}
+              className="absolute inset-0"
+              imgClassName={value("variant") === "cinema" ? "opacity-55" : "opacity-40"}
+              showButton={false}
+            />
+          ) : (
+            <div
+              className={`absolute inset-0 bg-cover bg-center ${value("variant") === "cinema" ? "opacity-55" : "opacity-40"}`}
+              style={{ backgroundImage: `url(${imageSrc(value("image") || "/hero-bg.jpg")})` }}
+            />
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0c121d] via-[#0c121d]/80 to-transparent" />
+          {editable && (
+            <div className="absolute top-4 right-4 z-40">
+              <ChangeImageButton onChange={(image) => set("image", image)} />
+            </div>
+          )}
           <div className="relative z-10 mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6">
             <div className="max-w-2xl">
               {editable ? (
@@ -679,12 +739,24 @@ export function PublicSection({
       {section.type === "storySplit" && (
         <section className="bg-white">
           <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-6 py-16 lg:grid-cols-2">
-            <div className="relative min-h-[280px] overflow-hidden rounded-2xl bg-cover bg-center" style={{ backgroundImage: `url(${imageSrc(value("image") || "/car-toyota-bz3x.jpg")})` }}>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="relative min-h-[280px] overflow-hidden rounded-2xl">
               {editable ? (
-                <Editable as="p" value={value("overlay")} onChange={(overlay) => set("overlay", overlay)} className="absolute bottom-6 left-6 text-xl font-extrabold uppercase leading-tight text-white whitespace-pre-line" />
+                <EditableImage
+                  src={imageSrc(value("image") || "/car-toyota-bz3x.jpg")}
+                  onChange={(image) => set("image", image)}
+                  className="absolute inset-0"
+                />
               ) : (
-                <p className="absolute bottom-6 left-6 text-xl font-extrabold uppercase leading-tight text-white whitespace-pre-line">{value("overlay")}</p>
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${imageSrc(value("image") || "/car-toyota-bz3x.jpg")})` }}
+                />
+              )}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              {editable ? (
+                <Editable as="p" value={value("overlay")} onChange={(overlay) => set("overlay", overlay)} className="absolute bottom-6 left-6 z-10 text-xl font-extrabold uppercase leading-tight text-white whitespace-pre-line" />
+              ) : (
+                <p className="absolute bottom-6 left-6 z-10 text-xl font-extrabold uppercase leading-tight text-white whitespace-pre-line">{value("overlay")}</p>
               )}
             </div>
             <div>
@@ -819,13 +891,26 @@ export function PublicSection({
               )}
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {((section.photos as { src: string }[]) || []).slice(0, 3).map((photo, index) => (
-                <div
-                  key={index}
-                  className={`rounded-2xl bg-cover bg-center ${index === 0 ? "row-span-2 min-h-[280px]" : "min-h-[132px]"}`}
-                  style={{ backgroundImage: `url(${imageSrc(photo.src)})` }}
-                />
-              ))}
+              {((section.photos as { src: string }[]) || []).slice(0, 3).map((photo, index) =>
+                editable ? (
+                  <EditableImage
+                    key={index}
+                    src={imageSrc(photo.src)}
+                    onChange={(src) => {
+                      const photos = [...((section.photos as { src: string }[]) || [])];
+                      photos[index] = { ...photo, src };
+                      onChange?.({ photos });
+                    }}
+                    className={`rounded-2xl ${index === 0 ? "row-span-2 min-h-[280px]" : "min-h-[132px]"}`}
+                  />
+                ) : (
+                  <div
+                    key={index}
+                    className={`rounded-2xl bg-cover bg-center ${index === 0 ? "row-span-2 min-h-[280px]" : "min-h-[132px]"}`}
+                    style={{ backgroundImage: `url(${imageSrc(photo.src)})` }}
+                  />
+                ),
+              )}
             </div>
           </div>
         </section>
@@ -892,7 +977,19 @@ export function PublicSection({
           <div className="mx-auto grid max-w-[1400px] gap-5 px-6 py-10 sm:grid-cols-2 lg:grid-cols-3">
             {((section.items as { name: string; count: string; image: string }[]) || []).map((item, index) => (
               <article key={index} className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                <div className="aspect-[16/9] bg-cover bg-center" style={{ backgroundImage: `url(${imageSrc(item.image)})` }} />
+                {editable ? (
+                  <EditableImage
+                    src={imageSrc(item.image)}
+                    onChange={(image) => {
+                      const items = [...((section.items as { name: string; count: string; image: string }[]) || [])];
+                      items[index] = { ...item, image };
+                      onChange?.({ items });
+                    }}
+                    className="aspect-[16/9]"
+                  />
+                ) : (
+                  <div className="aspect-[16/9] bg-cover bg-center" style={{ backgroundImage: `url(${imageSrc(item.image)})` }} />
+                )}
                 <div className="p-4">
                   {editable ? (
                     <>
@@ -932,9 +1029,9 @@ export function PublicSection({
         <section className="bg-[#f8fafc] px-6 py-16">
           <div className="mx-auto max-w-[1400px] rounded-2xl border border-[#e6ebf1] bg-white p-8">
             <p className="text-sm font-semibold text-[#1a1a2e]">
-              {value("widget") === "inventory" && "Машины жагсаалт — нийтийн хуудастай ижил"}
-              {value("widget") === "contact" && "Холбоо барих форм — нийтийн хуудастай ижил"}
-              {value("widget") === "financing" && "Санхүүжилтийн тооцоолуур — нийтийн хуудастай ижил"}
+              {value("widget") === "inventory" && "Машины жагсаалт — CRUD өгөгдөл, энд засахгүй"}
+              {value("widget") === "contact" && "Холбоо барих форм — CRUD өгөгдөл, энд засахгүй"}
+              {value("widget") === "financing" && "Санхүүжилтийн тооцоолуур — CRUD өгөгдөл, энд засахгүй"}
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {[1, 2, 3].map((item) => (
@@ -953,6 +1050,7 @@ export function PublicPage({
   footer,
   sections,
   cars,
+  brands,
   activeHref,
   selectedId,
   editable,
@@ -966,6 +1064,7 @@ export function PublicPage({
   footer: FooterCms;
   sections: CmsSection[];
   cars: Car[];
+  brands?: Brand[];
   activeHref?: string;
   selectedId?: string | null;
   editable?: boolean;
@@ -991,6 +1090,7 @@ export function PublicPage({
               key={section.id}
               section={section}
               cars={cars}
+              brands={brands}
               selected={selectedId === section.id}
               editable={editable}
               onSelect={() => onSelect?.(section.id)}

@@ -7,14 +7,12 @@ import {
   FilePenLine,
   LayoutDashboard,
   MessageSquareMore,
-  PanelTop,
   Tags,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/", label: "Хянах самбар", icon: LayoutDashboard },
-  { href: "/site", label: "Толгой ба хөл", icon: PanelTop },
   { href: "/pages", label: "Хуудсууд", icon: FilePenLine },
   { href: "/cars", label: "Машинууд", icon: CarFront },
   { href: "/brands", label: "Брэндүүд", icon: Tags },
@@ -23,7 +21,7 @@ const links = [
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isEditor = pathname.startsWith("/pages/") && pathname !== "/pages";
+  const isEditor = pathname === "/pages" || pathname.startsWith("/pages/");
 
   return (
     <div className="flex min-h-full bg-[#f4f6f8]">

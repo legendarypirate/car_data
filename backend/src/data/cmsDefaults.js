@@ -69,6 +69,7 @@ const defaultPages = [
         primaryLabel: "Машинууд үзэх",
         primaryHref: "/inventory",
         secondaryLabel: "Бидний тухай үзэх",
+        secondaryHref: "/about",
         badgeEyebrow: "Цахилгаан",
         badgeLine: "Шинэ үеийн SUV",
         badgeBrand: "TOYOTA",

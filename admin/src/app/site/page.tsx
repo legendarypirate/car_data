@@ -1,5 +1,5 @@
-import { ChromeEditor } from "@/components/visual/chrome-editor";
+import { redirect } from "next/navigation";
 
 export default function SiteChromePage() {
-  return <ChromeEditor />;
+  redirect("/pages?tab=header");
 }

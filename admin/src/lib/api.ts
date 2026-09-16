@@ -53,3 +53,7 @@ export function imageSrc(path?: string | null) {
   const site = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
   return `${site}${path}`;
 }
+
+export function publicSiteUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:4000";
+}
