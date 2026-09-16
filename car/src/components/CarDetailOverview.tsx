@@ -6,6 +6,7 @@ import type { Car } from "@/data/cars";
 import { formatPrice, statusCopy } from "@/lib/format";
 import { CarDetailFinancing } from "@/components/CarDetailFinancing";
 import { InquiryForm } from "@/components/InquiryForm";
+import { KhanBankLoanButton } from "@/components/KhanBankLoanButton";
 import { mergeCarTabs } from "@/lib/car-tabs";
 import { interiorHeroSrc } from "@/components/CarDetailInterior";
 
@@ -38,6 +39,7 @@ export function OverviewHeroCopy({ car }: { car: Car }) {
         >
           Тест драйв захиалах
         </Link>
+        <KhanBankLoanButton car={car.slug} price={car.price} variant="blue" />
       </div>
     </>
   );
@@ -244,6 +246,7 @@ export function CarDetailOverview({
             >
               Тест драйв захиалах
             </Link>
+            <KhanBankLoanButton car={car.slug} price={car.price} variant="blue" className="w-full" />
           </div>
         </aside>
       </div>

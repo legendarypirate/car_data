@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { fetchCars } from "@/lib/cars";
+import { apiPath } from "@/lib/api-url";
+import { formatPrice } from "@/lib/format";
 import type { Car } from "@/data/cars";
 
 interface ContactSectionProps {
@@ -38,31 +41,97 @@ const faqs = [
 ];
 
 export function ContactSection({ defaultCar }: ContactSectionProps) {
-  // Form state
+  const searchParams = useSearchParams();
+  const inquiryType = searchParams.get("type") || "";
+  const isKhanBank = inquiryType === "khanbank";
+  const down = searchParams.get("down");
+  const term = searchParams.get("term");
+  const monthly = searchParams.get("monthly");
+  const price = searchParams.get("price");
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [selectedCar, setSelectedCar] = useState(defaultCar ?? "");
+  const [selectedCar, setSelectedCar] = useState(defaultCar ?? searchParams.get("car") ?? "");
   const [message, setMessage] = useState("");
   const [agree, setAgree] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const [cars, setCars] = useState<Car[]>([]);
 
   // FAQ Accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchCars().then(setCars);
-  }, []);
+    fetchCars().then((list) => {
+      setCars(list);
+      const param = defaultCar || searchParams.get("car") || "";
+      if (!param) return;
+      const match = list.find((car) => car.slug === param || car.uuid === param);
+      if (match) setSelectedCar(match.slug);
+    });
+  }, [defaultCar, searchParams]);
+
+  const loanSummary = useMemo(() => {
+    if (!isKhanBank) return "";
+    const parts = ["Хаан банкны зээл судлуулах хүсэлт."];
+    if (price) parts.push(`Машины үнэ: ${formatPrice(Number(price))}`);
+    if (down) parts.push(`Урьдчилгаа: ${down}%`);
+    if (term) parts.push(`Хугацаа: ${term} сар`);
+    if (monthly) parts.push(`Сарын төлбөр (ойролцоогоор): ${formatPrice(Number(monthly))}`);
+    return parts.join("\n");
+  }, [isKhanBank, down, term, monthly, price]);
+
+  useEffect(() => {
+    if (loanSummary) setMessage((current) => current || loanSummary);
+  }, [loanSummary]);
 
   const toggleFaq = (id: number) => {
     setOpenFaq((prev) => (prev === id ? null : id));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name || !phone || !message) return;
-    setSubmitted(true);
+    if (!name || !phone || !message || !agree) return;
+    const chosen = cars.find((car) => car.slug === selectedCar || car.uuid === selectedCar);
+    const carLabel = chosen
+      ? `${chosen.brand} ${chosen.name}`
+      : selectedCar === "other"
+        ? "Бусад загвар"
+        : selectedCar || "Тодорхойгүй";
+    const prefix =
+      inquiryType === "khanbank"
+        ? "Хаан банкны зээл"
+        : inquiryType === "testdrive"
+          ? "Тест драйв"
+          : inquiryType === "financing"
+            ? "Санхүүжилт"
+            : "";
+    setSending(true);
+    setError("");
+    try {
+      const response = await fetch(apiPath("/api/inquiries"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          phone,
+          email: email.trim() || "-",
+          car: carLabel,
+          notes: prefix ? `[${prefix}]\n${message}` : message,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.message || "Хүсэлт илгээж чадсангүй");
+      }
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Хүсэлт илгээж чадсангүй");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -281,11 +350,12 @@ export function ContactSection({ defaultCar }: ContactSectionProps) {
         {/* Col 2: Send a Message Form */}
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-[#e2e8f0]">
           <h2 className="text-xl font-bold tracking-tight text-ink">
-            Бидэнд зурвас илгээх
+            {isKhanBank ? "Хаан банкны зээл судлуулах" : "Бидэнд зурвас илгээх"}
           </h2>
           <p className="mt-1 text-[13px] text-[#64748b]">
-            Доорх маягтыг бөглөж, бид тантай хамгийн түргэн хугацаанд холбогдох
-            болно.
+            {isKhanBank
+              ? "Мэдээллээ үлдээвэл NDA AUTO Хаан банкаар зээлийн боломжийг тань судалж, хариу мэдэгдэнэ."
+              : "Доорх маягтыг бөглөж, бид тантай хамгийн түргэн хугацаанд холбогдох болно."}
           </p>
 
           {submitted ? (
@@ -305,11 +375,12 @@ export function ContactSection({ defaultCar }: ContactSectionProps) {
                 </svg>
               </div>
               <h3 className="mt-3 text-[15px] font-bold text-emerald-900">
-                Таны зурвас амжилттай илгээгдлээ!
+                {isKhanBank ? "Зээлийн хүсэлт илгээгдлээ!" : "Таны зурвас амжилттай илгээгдлээ!"}
               </h3>
               <p className="mt-1 text-[12px] text-emerald-700">
-                Манай зөвлөх тантай тун удахгүй утсаар эсвэл и-мэйлээр холбогдох
-                болно.
+                {isKhanBank
+                  ? "Манай зөвлөх тантай холбогдож, Хаан банкны зээлийн материалыг бүрдүүлнэ."
+                  : "Манай зөвлөх тантай тун удахгүй утсаар эсвэл и-мэйлээр холбогдох болно."}
               </p>
               <button
                 type="button"
@@ -407,12 +478,17 @@ export function ContactSection({ defaultCar }: ContactSectionProps) {
                 <span>Би хувийн мэдээллийг боловсруулахыг зөвшөөрч байна.</span>
               </label>
 
+              {error && (
+                <p className="text-[12px] font-medium text-red-600">{error}</p>
+              )}
+
               {/* Submit button */}
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0c121d] py-3 text-[13px] font-bold text-white shadow-md transition-all hover:bg-[#1e293b] active:scale-[0.98]"
+                disabled={sending || !agree}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0c121d] py-3 text-[13px] font-bold text-white shadow-md transition-all hover:bg-[#1e293b] active:scale-[0.98] disabled:opacity-60"
               >
-                <span>Илгээх</span>
+                <span>{sending ? "Илгээж байна..." : isKhanBank ? "Зээл судлуулах" : "Илгээх"}</span>
                 <svg
                   width="14"
                   height="14"

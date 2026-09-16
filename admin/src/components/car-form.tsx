@@ -34,7 +34,7 @@ const emptyCar = {
   badge: "",
   badgeColor: "",
   eta: "",
-  highlights: "",
+  highlights: [] as string[],
   description: "",
   image: "",
   gallery: [] as string[],
@@ -68,7 +68,7 @@ function fromCar(car?: Car): FormState {
     badge: car.badge || "",
     badgeColor: car.badgeColor || "",
     eta: car.eta || "",
-    highlights: (car.highlights || []).join("\n"),
+    highlights: car.highlights?.length ? car.highlights : [],
     description: car.description,
     image: car.image,
     gallery: car.gallery?.length ? car.gallery : car.image ? [car.image] : [],
@@ -115,6 +115,7 @@ export function CarForm({ car }: { car?: Car }) {
         batteryKwh: form.batteryKwh === "" ? null : Number(form.batteryKwh),
         chargeMinutes: form.chargeMinutes === "" ? null : Number(form.chargeMinutes),
         gallery: form.gallery.length ? form.gallery : form.image ? [form.image] : [],
+        highlights: form.highlights.map((item) => item.trim()).filter(Boolean),
       };
       if (car) {
         await api(`/api/cars/${car.id}`, {
@@ -293,9 +294,38 @@ export function CarForm({ car }: { car?: Car }) {
       </Section>
 
       <Section title="Тайлбар" description="Нийтийн хуудсанд харагдах текст." columns={2}>
-        <Field label="Онцлох (мөр бүр нэг)">
-          <Textarea rows={5} value={form.highlights} onChange={(e) => update("highlights", e.target.value)} />
-        </Field>
+        <div className="grid gap-1.5">
+          <Label>Онцлох</Label>
+          <div className="space-y-2">
+            {form.highlights.map((item, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  value={item}
+                  onChange={(e) => {
+                    const next = [...form.highlights];
+                    next[index] = e.target.value;
+                    update("highlights", next);
+                  }}
+                  placeholder="Жишээ: 800V өндөр хүчдэлийн платформ"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => update("highlights", form.highlights.filter((_, i) => i !== index))}
+                >
+                  Устгах
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => update("highlights", [...form.highlights, ""])}
+            >
+              Онцлох нэмэх
+            </Button>
+          </div>
+        </div>
         <Field label="Тайлбар">
           <Textarea rows={5} required value={form.description} onChange={(e) => update("description", e.target.value)} />
         </Field>

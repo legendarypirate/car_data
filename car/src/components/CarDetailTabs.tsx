@@ -11,6 +11,7 @@ import { CarDetailInterior, interiorHeroSrc } from "@/components/CarDetailInteri
 import { CarDetailDesign, DesignHeroCopy } from "@/components/CarDetailDesign";
 import { CarDetailOverview, OverviewHeroCopy } from "@/components/CarDetailOverview";
 import { CarDetailSpecs } from "@/components/CarDetailSpecs";
+import { KhanBankLoanButton } from "@/components/KhanBankLoanButton";
 import { mergeCarTabs, TAB_IDS, type TabId } from "@/lib/car-tabs";
 
 type TabKey = TabId;
@@ -174,12 +175,20 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
             })}
           </div>
 
-          <Link
-            href={`/contact?car=${car.slug}&type=testdrive`}
-            className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-[#0b1220] px-4 text-[13px] font-semibold text-white hover:bg-[#1e293b] sm:inline-flex"
-          >
-            Тест драйв захиалах <span>→</span>
-          </Link>
+          <div className="hidden shrink-0 items-center gap-2 sm:flex">
+            <KhanBankLoanButton
+              car={car.slug}
+              price={car.price}
+              variant="blue"
+              className="h-10"
+            />
+            <Link
+              href={`/contact?car=${car.slug}&type=testdrive`}
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#0b1220] px-4 text-[13px] font-semibold text-white hover:bg-[#1e293b]"
+            >
+              Тест драйв захиалах <span>→</span>
+            </Link>
+          </div>
         </div>
       </div>
 

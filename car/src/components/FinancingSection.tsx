@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { formatAmount, parseAmount } from "@/lib/format";
 import { fetchCars } from "@/lib/cars";
+import { KhanBankLoanButton } from "@/components/KhanBankLoanButton";
 import type { Car } from "@/data/cars";
 
 const partnerBanks = [
@@ -221,23 +222,15 @@ export function FinancingSection() {
                 </p>
               </div>
 
-              <Link
-                href={`/contact?car=${selectedCarSlug}&type=financing`}
-                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-[#0c121d] px-4 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-[#1e293b]"
-              >
-                <span>Санхүүжилт хүсэх</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <path d="M5 12h14" />
-                  <path d="m12 5 7 7-7 7" />
-                </svg>
-              </Link>
+              <KhanBankLoanButton
+                car={selectedCarSlug}
+                downPercent={downPaymentPercent}
+                termMonths={termMonths}
+                monthly={monthlyPayment}
+                price={customPrice}
+                variant="dark"
+                className="h-9 px-4 text-[12px]"
+              />
             </div>
 
             <p className="text-[10px] text-[#94a3b8] leading-tight">

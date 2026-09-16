@@ -17,10 +17,16 @@ router.get("/", async (_req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const { name, email, phone, car, notes } = req.body;
-    if (!name || !email || !phone || !car) {
-      return res.status(400).json({ message: "Нэр, имэйл, утас, машин шаардлагатай" });
+    if (!name || !phone || !car) {
+      return res.status(400).json({ message: "Нэр, утас, машин шаардлагатай" });
     }
-    const inquiry = await Inquiry.create({ name, email, phone, car, notes });
+    const inquiry = await Inquiry.create({
+      name,
+      email: email?.trim() || "-",
+      phone,
+      car,
+      notes,
+    });
     res.status(201).json(inquiry);
   } catch (error) {
     next(error);

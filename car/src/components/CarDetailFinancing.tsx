@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { formatPrice } from "@/lib/format";
+import { KhanBankLoanButton } from "@/components/KhanBankLoanButton";
 
 export function CarDetailFinancing({
   carPrice,
@@ -124,13 +124,15 @@ export function CarDetailFinancing({
             </div>
           </div>
 
-          <Link
-            href={`/contact?car=${carSlug}&type=financing`}
-            className="mt-6 flex h-10 items-center justify-center gap-2 rounded-xl bg-white text-[13px] font-bold text-[#0c121d] shadow-sm transition-all hover:bg-white/90 active:scale-95"
-          >
-            <span>Энэ нөхцөлөөр хүсэлт илгээх</span>
-            <span>→</span>
-          </Link>
+          <KhanBankLoanButton
+            car={carSlug}
+            downPercent={downPaymentPercent}
+            termMonths={termMonths}
+            monthly={monthlyPayment}
+            price={carPrice}
+            variant="light"
+            className="mt-6 h-10 w-full"
+          />
         </div>
       </div>
     </div>
