@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+node_modules/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+car/public/uploads/*
+!car/public/uploads/.gitkeep
+backend/uploads/
+admin/public/uploads/

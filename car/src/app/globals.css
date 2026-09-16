@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  --brand: #1a6bff;
+  --brand-dark: #0052d9;
+  --accent: #f5770b;
+  --ink: #1a1a2e;
+  --mute: #6b7280;
+  --line: #e6ebf1;
+  --canvas: #f7f8fa;
+  --dark: #0a0f1a;
+  --dark-card: #111827;
+  --dark-muted: #9ca3af;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-mute: var(--mute);
+  --color-line: var(--line);
+  --color-canvas: var(--canvas);
+  --color-dark: var(--dark);
+  --color-dark-card: var(--dark-card);
+  --color-dark-muted: var(--dark-muted);
+  --font-sans: var(--font-exo);
+
+  --animate-fade-in: fadeIn 0.6s ease-out both;
+  --animate-slide-up: slideUp 0.7s ease-out both;
+  --animate-slide-right: slideRight 0.6s ease-out both;
+  --animate-scale-in: scaleIn 0.5s ease-out both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.radar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(56, 189, 248, 0.22) 50deg,
+    transparent 95deg
+  );
+  animation: radarSweep 5s linear infinite;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #fff;
+  color: var(--ink);
+}
+
+::selection {
+  color: #fff;
+  background: var(--brand);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c7d0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a8b4;
+}
