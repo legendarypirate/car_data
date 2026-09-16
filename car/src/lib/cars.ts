@@ -1,10 +1,9 @@
 import { cars, getCar, type Car } from "@/data/cars";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
+import { apiPath } from "@/lib/api-url";
 
 export async function getLiveCars(): Promise<Car[]> {
   try {
-    const response = await fetch(`${API_URL}/api/cars`, { next: { revalidate: 5 } });
+    const response = await fetch(apiPath("/api/cars"), { cache: "no-store" });
     if (!response.ok) return cars;
     const list = (await response.json()) as Car[];
     return list.length ? list : cars;
@@ -15,7 +14,7 @@ export async function getLiveCars(): Promise<Car[]> {
 
 export async function getLiveCar(slug: string): Promise<Car | undefined> {
   try {
-    const response = await fetch(`${API_URL}/api/cars/${slug}`, { next: { revalidate: 5 } });
+    const response = await fetch(apiPath(`/api/cars/${slug}`), { cache: "no-store" });
     if (response.ok) return (await response.json()) as Car;
   } catch {
     // fall through

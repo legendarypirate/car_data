@@ -1,4 +1,5 @@
 import { brands as fallbackNames } from "@/data/cars";
+import { apiPath } from "@/lib/api-url";
 
 export type Brand = {
   id: number;
@@ -7,8 +8,6 @@ export type Brand = {
   image: string;
   carCount?: number;
 };
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
 
 export const fallbackBrands: Brand[] = fallbackNames.map((name, index) => ({
   id: index + 1,
@@ -20,9 +19,7 @@ export const fallbackBrands: Brand[] = fallbackNames.map((name, index) => ({
 
 export async function getBrands(): Promise<Brand[]> {
   try {
-    const response = await fetch(`${API_URL}/api/brands`, {
-      next: { revalidate: 5 },
-    });
+    const response = await fetch(apiPath("/api/brands"), { cache: "no-store" });
     if (!response.ok) return fallbackBrands;
     return (await response.json()) as Brand[];
   } catch {
@@ -32,7 +29,7 @@ export async function getBrands(): Promise<Brand[]> {
 
 export async function fetchBrands(): Promise<Brand[]> {
   try {
-    const response = await fetch(`${API_URL}/api/brands`);
+    const response = await fetch(apiPath("/api/brands"));
     if (!response.ok) return fallbackBrands;
     return (await response.json()) as Brand[];
   } catch {

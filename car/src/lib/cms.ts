@@ -1,3 +1,5 @@
+import { apiPath } from "@/lib/api-url";
+
 export type NavLink = { label: string; href: string };
 
 export type HeaderCms = {
@@ -38,12 +40,10 @@ export type CmsPage = {
   sections: CmsSection[];
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
 async function cmsFetch<T>(path: string): Promise<T | null> {
   try {
-    const response = await fetch(`${API_URL}${path}`, {
-      next: { revalidate: 5 },
+    const response = await fetch(apiPath(path), {
+      cache: "no-store",
     });
     if (!response.ok) return null;
     return (await response.json()) as T;

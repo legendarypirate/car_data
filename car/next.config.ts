@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "res.cloudinary.com",
       },
+      {
+        protocol: "https",
+        hostname: "carapi.teensclub.mn",
+      },
+      {
+        protocol: "https",
+        hostname: "*.teensclub.mn",
+      },
     ],
   },
 };
