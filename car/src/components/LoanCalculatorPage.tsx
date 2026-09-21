@@ -13,8 +13,9 @@ import {
   DEFAULT_DOWN_PERCENT,
   DOWN_PAYMENT_OPTIONS,
   khanBankContactHref,
-  KHAN_BANK_LOAN_TERM_MONTHS,
+  LOAN_TERM_OPTIONS,
   MIN_DOWN_PERCENT,
+  DEFAULT_TERM_MONTHS,
 } from "@/lib/loan";
 import type { Car } from "@/data/cars";
 
@@ -96,6 +97,9 @@ export function LoanCalculatorPage() {
   const [additionalMonthly, setAdditionalMonthly] = useState(
     readNumber(searchParams.get("extra"), DEFAULT_ADDITIONAL_MONTHLY)
   );
+  const [termMonths, setTermMonths] = useState(
+    readNumber(searchParams.get("term"), DEFAULT_TERM_MONTHS)
+  );
 
   useEffect(() => {
     fetchCars().then((list) => {
@@ -127,18 +131,18 @@ export function LoanCalculatorPage() {
       calculateLoan({
         price,
         downPercent,
-        termMonths: KHAN_BANK_LOAN_TERM_MONTHS,
+        termMonths,
         annualRate: DEFAULT_ANNUAL_RATE,
         additionalMonthly,
       }),
-    [price, downPercent, additionalMonthly]
+    [price, downPercent, termMonths, additionalMonthly]
   );
 
   const contactHref = khanBankContactHref({
     car: selectedCarSlug,
     price,
     downPercent,
-    termMonths: KHAN_BANK_LOAN_TERM_MONTHS,
+    termMonths,
     monthly: calculation.monthlyPayment,
     rate: DEFAULT_ANNUAL_RATE,
     extra: additionalMonthly,
@@ -155,7 +159,7 @@ export function LoanCalculatorPage() {
             Зээлийн тооцоолуур
           </h1>
           <p className="mt-1 text-[13px] text-[#64748b]">
-            Хаан банк · {KHAN_BANK_LOAN_TERM_MONTHS} сарын хугацаатай урьдчилсан тооцоолол
+            Хаан банк · урьдчилсан зээлийн тооцоолол
           </p>
         </div>
         <Link
@@ -170,7 +174,7 @@ export function LoanCalculatorPage() {
       <div className="rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-sm md:p-5">
         <h2 className="text-[15px] font-bold text-[#0f172a]">Машин ба урьдчилгаа</h2>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div>
             <label className={labelClass}>Машины загвар, үнэ</label>
             <select
@@ -210,7 +214,22 @@ export function LoanCalculatorPage() {
             >
               {ADDITIONAL_MONTHLY_OPTIONS.map((value) => (
                 <option key={value} value={value}>
-                  {formatAmount(value)}
+                  {value === 0 ? "0" : `${formatAmount(value)}₮`}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className={labelClass}>Зээлийн хугацаа (сар)</label>
+            <select
+              value={termMonths}
+              onChange={(e) => setTermMonths(Number(e.target.value))}
+              className={selectClass}
+            >
+              {LOAN_TERM_OPTIONS.map((months) => (
+                <option key={months} value={months}>
+                  {months} сар
                 </option>
               ))}
             </select>
@@ -276,7 +295,7 @@ export function LoanCalculatorPage() {
               </svg>
             }
             label="Зээлийн хугацаа"
-            value={`${KHAN_BANK_LOAN_TERM_MONTHS} сар`}
+            value={`${termMonths} сар`}
           />
           <StatCard
             icon={
@@ -286,7 +305,7 @@ export function LoanCalculatorPage() {
               </svg>
             }
             label="Зээл дуусах хугацаа"
-            value={`${KHAN_BANK_LOAN_TERM_MONTHS} сар`}
+            value={`${termMonths} сар`}
           />
           <StatCard
             icon={
@@ -312,7 +331,7 @@ export function LoanCalculatorPage() {
             <div className="flex flex-wrap gap-x-5 gap-y-1 text-[12px] text-white/65">
               <span>
                 Дуусах хугацаа:{" "}
-                <strong className="text-white">{KHAN_BANK_LOAN_TERM_MONTHS} сар</strong>
+                <strong className="text-white">{termMonths} сар</strong>
               </span>
               <span>
                 Нийт төлөх:{" "}
