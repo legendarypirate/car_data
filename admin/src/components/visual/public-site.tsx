@@ -87,13 +87,16 @@ export function PublicHeader({
               ⌕
             </span>
           )}
-          <span className="inline-flex h-9 items-center rounded-lg border border-white/20 bg-white/5 px-4 text-[13px] font-medium text-white">
-            {editable ? (
-              <Editable value={header.ctaLabel} onChange={(ctaLabel) => set({ ctaLabel })} />
-            ) : (
-              header.ctaLabel
-            )}
-          </span>
+          {header.ctaLabel && (
+            <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0c121d] shadow-sm">
+              {editable ? (
+                <Editable value={header.ctaLabel} onChange={(ctaLabel) => set({ ctaLabel })} />
+              ) : (
+                header.ctaLabel
+              )}
+              <span aria-hidden>→</span>
+            </span>
+          )}
           <div className="text-[12px] font-medium text-white/60">
             {editable ? (
               <>

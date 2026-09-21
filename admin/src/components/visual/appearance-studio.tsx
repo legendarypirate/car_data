@@ -193,10 +193,18 @@ export function AppearanceStudio() {
                   <CardTitle>Товч, хайлт</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
+                  <Field label="Товчны нэр">
+                    <Input
+                      value={header.ctaLabel}
+                      onChange={(e) => setHeader({ ...header, ctaLabel: e.target.value })}
+                      placeholder="Холбоо барих"
+                    />
+                  </Field>
                   <Field label="Товчны холбоос">
                     <Input
                       value={header.ctaHref}
                       onChange={(e) => setHeader({ ...header, ctaHref: e.target.value })}
+                      placeholder="/contact"
                     />
                   </Field>
                   <label className="flex items-center gap-2 text-sm">
