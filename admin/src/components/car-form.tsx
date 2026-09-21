@@ -238,6 +238,7 @@ export function CarForm({ car }: { car?: Car }) {
           <select className={selectClass} value={form.drivetrain} onChange={(e) => update("drivetrain", e.target.value)}>
             <option value="2WD">2WD</option>
             <option value="AWD">AWD</option>
+            <option value="FWD">FWD</option>
           </select>
         </Field>
         <Field label="Суудал">
