@@ -3,7 +3,7 @@ import type { CarTabs } from "@/lib/car-tabs";
 export type CarStatus = "in-stock" | "in-transit" | "order";
 export type BodyType = "All" | "EV" | "SUV" | "Sedan" | "MPV" | "Hatchback" | "Pickup" | "Sport";
 export type FuelType = "EV" | "HEV" | "Petrol" | "Diesel";
-export type DriveType = "2WD" | "AWD";
+export type DriveType = "2WD" | "AWD" | "FWD";
 
 export type Car = {
   id?: number;

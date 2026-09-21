@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { apiPath } from "@/lib/api-url";
 import type { FooterCms, HeaderCms } from "@/lib/cms";
 
@@ -25,7 +25,13 @@ const fallback: HeaderCms = {
 
 export function Header({ data }: { data?: HeaderCms | null }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [header, setHeader] = useState<HeaderCms>(data || fallback);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch(apiPath("/api/cms/chrome"))
@@ -35,6 +41,42 @@ export function Header({ data }: { data?: HeaderCms | null }) {
       })
       .catch(() => undefined);
   }, []);
+
+  useEffect(() => {
+    setSearchOpen(false);
+    if (pathname === "/inventory") {
+      setQuery(searchParams.get("q") ?? "");
+    }
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    inputRef.current?.focus();
+
+    function onPointerDown(event: MouseEvent) {
+      if (!searchRef.current?.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setSearchOpen(false);
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [searchOpen]);
+
+  function submitSearch(event?: FormEvent) {
+    event?.preventDefault();
+    const q = query.trim();
+    router.push(q ? `/inventory?q=${encodeURIComponent(q)}` : "/inventory");
+    setSearchOpen(false);
+  }
 
   return (
     <header className="sticky top-0 z-40 bg-[#0c121d] backdrop-blur-md border-b border-white/5">
@@ -74,15 +116,50 @@ export function Header({ data }: { data?: HeaderCms | null }) {
 
         <div className="flex items-center gap-4">
           {header.showSearch && (
-            <button
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Хайх"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </button>
+            <div ref={searchRef} className="relative">
+              {searchOpen ? (
+                <form
+                  onSubmit={submitSearch}
+                  className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#151c2b] p-1.5"
+                >
+                  <input
+                    ref={inputRef}
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Машин хайх..."
+                    className="h-8 w-36 bg-transparent px-2 text-[13px] text-white outline-none placeholder:text-white/40 sm:w-48"
+                    aria-label="Машин хайх"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex h-8 shrink-0 items-center rounded-lg bg-white px-3 text-[12px] font-semibold text-[#0c121d] hover:bg-white/90"
+                  >
+                    Хайх
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchOpen(false)}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white"
+                    aria-label="Хаах"
+                  >
+                    ×
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(true)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                  aria-label="Хайх"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </button>
+              )}
+            </div>
           )}
 
           {header.ctaLabel && header.ctaHref && (

@@ -3,6 +3,8 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const { Car, Inquiry, sequelize } = require("./models");
+const { resetCmsDefaults } = require("./lib/ensureCms");
+const { resetBrandDefaults } = require("./lib/ensureBrands");
 
 const featuredSlugs = [
   "toyota-bz3x",
@@ -30,6 +32,8 @@ function loadCarsFromFrontend() {
 }
 
 async function seed() {
+  const resetAll = process.argv.includes("--all");
+
   await sequelize.authenticate();
   await sequelize.sync();
 
@@ -56,7 +60,16 @@ async function seed() {
     },
   ]);
 
+  if (resetAll) {
+    await resetCmsDefaults();
+    await resetBrandDefaults();
+    console.log("Reset CMS pages, site chrome, and brands to defaults");
+  }
+
   console.log(`Seeded ${cars.length} cars and sample inquiries`);
+  if (!resetAll) {
+    console.log("Tip: run `npm run seed -- --all` to also reset CMS and brands");
+  }
   await sequelize.close();
 }
 

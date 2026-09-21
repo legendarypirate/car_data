@@ -3,25 +3,30 @@ const { CmsPage } = require("../models/CmsPage");
 const { defaultHeader, defaultFooter, defaultPages } = require("../data/cmsDefaults");
 
 async function ensureCms() {
-  await SiteChrome.findOrCreate({
-    where: { id: 1 },
-    defaults: { id: 1, header: defaultHeader, footer: defaultFooter },
-  });
-
-  for (const page of defaultPages) {
-    const [record, created] = await CmsPage.findOrCreate({
-      where: { slug: page.slug },
-      defaults: page,
+  const chromeCount = await SiteChrome.count();
+  if (chromeCount === 0) {
+    await SiteChrome.create({
+      id: 1,
+      header: defaultHeader,
+      footer: defaultFooter,
     });
-    if (!created && page.slug === "about") {
-      const types = (record.sections || []).map((section) => section.type);
-      if (!types.includes("storySplit") || !types.includes("team")) {
-        record.title = page.title;
-        record.sections = page.sections;
-        await record.save();
-      }
-    }
+  }
+
+  const pageCount = await CmsPage.count();
+  if (pageCount === 0) {
+    await CmsPage.bulkCreate(defaultPages);
   }
 }
 
-module.exports = { ensureCms };
+async function resetCmsDefaults() {
+  await SiteChrome.destroy({ where: {} });
+  await CmsPage.destroy({ where: {} });
+  await SiteChrome.create({
+    id: 1,
+    header: defaultHeader,
+    footer: defaultFooter,
+  });
+  await CmsPage.bulkCreate(defaultPages);
+}
+
+module.exports = { ensureCms, resetCmsDefaults };

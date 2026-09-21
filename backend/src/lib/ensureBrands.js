@@ -20,12 +20,25 @@ function slugify(value) {
 }
 
 async function ensureBrands() {
-  for (const brand of defaults) {
-    await Brand.findOrCreate({
-      where: { slug: slugify(brand.name) },
-      defaults: { ...brand, slug: slugify(brand.name) },
-    });
-  }
+  const count = await Brand.count();
+  if (count > 0) return;
+
+  await Brand.bulkCreate(
+    defaults.map((brand) => ({
+      ...brand,
+      slug: slugify(brand.name),
+    })),
+  );
 }
 
-module.exports = { ensureBrands };
+async function resetBrandDefaults() {
+  await Brand.destroy({ where: {} });
+  await Brand.bulkCreate(
+    defaults.map((brand) => ({
+      ...brand,
+      slug: slugify(brand.name),
+    })),
+  );
+}
+
+module.exports = { ensureBrands, resetBrandDefaults, brandDefaults: defaults };

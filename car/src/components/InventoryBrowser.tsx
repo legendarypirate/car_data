@@ -44,6 +44,8 @@ export function InventoryBrowser() {
   }, []);
 
   useEffect(() => {
+    setSearchQuery(params.get("q") ?? "");
+    setCurrentPage(1);
     const brand = params.get("brand");
     if (brand) setSelectedBrands([brand]);
   }, [params]);
@@ -484,6 +486,7 @@ export function InventoryBrowser() {
               {[
                 { id: "2WD", label: "2WD (Хоёр дугуй)" },
                 { id: "AWD", label: "AWD (Бүх дугуй)" },
+                { id: "FWD", label: "FWD (Урд дугуй)" },
               ].map((d) => (
                 <label
                   key={d.id}
