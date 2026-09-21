@@ -18,6 +18,7 @@ export type LoanInputs = {
 export type LoanScheduleRow = {
   month: number;
   payment: number;
+  additionalPayment: number;
   interest: number;
   principal: number;
   balance: number;
@@ -70,7 +71,14 @@ export function calculateLoan({
       const payment = principal + interest + additionalMonthly;
       balance = Math.max(0, balance - principal);
       totalInterest += interest;
-      schedule.push({ month, payment, interest, principal, balance });
+      schedule.push({
+        month,
+        payment,
+        additionalPayment: additionalMonthly,
+        interest,
+        principal,
+        balance,
+      });
     }
   }
 
