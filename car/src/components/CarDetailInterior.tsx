@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import type { Car } from "@/data/cars";
 import { mergeCarTabs } from "@/lib/car-tabs";
 
@@ -128,20 +127,6 @@ export function CarDetailInterior({ car }: { car: Car }) {
           <p className="mt-3 text-[14px] text-white/70">
             {tabs.interior.subtitle || `${car.brand} ${shortName}`}
           </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={`/contact?car=${car.slug}`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0f172a] hover:bg-white/90"
-            >
-              Захиалга өгөх <span>→</span>
-            </Link>
-            <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/20 px-5 text-[13px] font-medium text-white hover:bg-white/10"
-            >
-              Тест драйв захиалах
-            </Link>
-          </div>
         </div>
       </section>
 

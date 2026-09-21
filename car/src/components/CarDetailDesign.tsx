@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import type { Car } from "@/data/cars";
 import { formatPrice } from "@/lib/format";
 import { mergeCarTabs } from "@/lib/car-tabs";
@@ -105,12 +104,6 @@ export function DesignHeroCopy({ car }: { car: Car }) {
         {formatPrice(car.price)}{" "}
         <span className="text-[13px] font-normal text-white/55">~ эхс</span>
       </p>
-      <Link
-        href={`/contact?car=${car.slug}`}
-        className="mt-6 inline-flex h-11 items-center gap-2 text-[14px] font-medium text-white hover:text-white/80"
-      >
-        Захиалга өгөх <span>→</span>
-      </Link>
     </>
   );
 }

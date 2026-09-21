@@ -92,12 +92,6 @@ export function CarDetailSpecs({ car }: { car: Car }) {
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-white px-5 text-[13px] font-bold text-[#0c121d] hover:bg-white/90"
-            >
-              Тест драйв захиалах →
-            </Link>
-            <Link
               href="/contact"
               className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 text-[13px] font-medium text-white hover:bg-white/10"
             >

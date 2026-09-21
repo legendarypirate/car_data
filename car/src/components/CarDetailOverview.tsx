@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import type { Car } from "@/data/cars";
 import { formatPrice, statusCopy } from "@/lib/format";
 import { CarDetailFinancing } from "@/components/CarDetailFinancing";
@@ -27,18 +26,6 @@ export function OverviewHeroCopy({ car }: { car: Car }) {
         <span className="text-[13px] font-normal text-white/55">~ эхс</span>
       </p>
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Link
-          href={`/contact?car=${car.slug}`}
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0f172a] hover:bg-white/90"
-        >
-          Захиалга өгөх <span>→</span>
-        </Link>
-        <Link
-          href={`/contact?car=${car.slug}&type=testdrive`}
-          className="inline-flex h-11 items-center gap-2 rounded-xl border border-white/30 px-5 text-[13px] font-medium text-white hover:bg-white/10"
-        >
-          Тест драйв захиалах
-        </Link>
         <KhanBankLoanButton car={car.slug} price={car.price} variant="blue" />
       </div>
     </>
@@ -196,59 +183,25 @@ export function CarDetailOverview({
           </div>
         )}
 
-      <div className="grid items-stretch gap-6 lg:grid-cols-12">
-        <div className="rounded-[28px] border border-[#eef2f6] bg-white p-7 shadow-[0_8px_24px_rgba(15,23,42,0.04)] lg:col-span-7">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#94a3b8]">
-            HIGHLIGHTS
-          </p>
-          <h3 className="mt-2 text-[26px] font-bold tracking-tight text-[#0f172a]">
-            Яагаад энэ машиныг сонгох вэ
-          </h3>
-          <ul className="mt-6 space-y-4">
-            {car.highlights.map((item) => (
-              <li key={item} className="flex items-start gap-3 text-[15px] text-[#0f172a]">
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0f172a]" />
-                {item}
-              </li>
-            ))}
-            <li className="flex items-start gap-3 text-[15px] text-[#0f172a]">
+      <div className="rounded-[28px] border border-[#eef2f6] bg-white p-7 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#94a3b8]">
+          HIGHLIGHTS
+        </p>
+        <h3 className="mt-2 text-[26px] font-bold tracking-tight text-[#0f172a]">
+          Яагаад энэ машиныг сонгох вэ
+        </h3>
+        <ul className="mt-6 space-y-4">
+          {car.highlights.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-[15px] text-[#0f172a]">
               <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0f172a]" />
-              {car.seats} суудал · {car.drivetrain} · {car.color}
+              {item}
             </li>
-          </ul>
-        </div>
-
-        <aside className="flex flex-col justify-between rounded-[28px] bg-[#0b1220] p-7 text-white lg:col-span-5">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-              {statusCopy[car.status].label}
-            </p>
-            <p className="mt-3 text-[15px] text-white/70">
-              {statusCopy[car.status].detail(car)}
-            </p>
-            <p className="mt-6 text-[32px] font-bold tracking-tight">
-              {formatPrice(car.price)}
-            </p>
-            <p className="mt-1 text-[12px] text-white/45">
-              Тээвэр, гааль, НӨАТ, бэлтгэл багтсан · ~ эхс
-            </p>
-          </div>
-          <div className="mt-8 flex flex-col gap-3">
-            <Link
-              href={`/contact?car=${car.slug}`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white text-[13px] font-semibold text-[#0f172a] hover:bg-white/90"
-            >
-              Захиалга өгөх →
-            </Link>
-            <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/20 text-[13px] font-medium hover:bg-white/10"
-            >
-              Тест драйв захиалах
-            </Link>
-            <KhanBankLoanButton car={car.slug} price={car.price} variant="blue" className="w-full" />
-          </div>
-        </aside>
+          ))}
+          <li className="flex items-start gap-3 text-[15px] text-[#0f172a]">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0f172a]" />
+            {car.seats} суудал · {car.drivetrain} · {car.color}
+          </li>
+        </ul>
       </div>
 
       <CarDetailFinancing
@@ -286,20 +239,6 @@ export function CarDetailOverview({
             <p className="mt-3 text-[15px] text-white/80">
               {car.brand} {shortName} — Ухаалаг сонголт, илүү сайн ирээдүй.
             </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={`/contact?car=${car.slug}`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0f172a]"
-            >
-              Захиалга өгөх →
-            </Link>
-            <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/30 px-5 text-[13px] font-medium"
-            >
-              Тест драйв захиалах
-            </Link>
           </div>
         </div>
       </section>

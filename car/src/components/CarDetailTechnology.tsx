@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import type { Car } from "@/data/cars";
 import { mergeCarTabs } from "@/lib/car-tabs";
 
@@ -108,20 +107,6 @@ export function CarDetailTechnology({ car }: { car: Car }) {
             {tabs.technology.subtitle && (
               <p className="mt-3 text-[15px] text-white/80">{tabs.technology.subtitle}</p>
             )}
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={`/contact?car=${car.slug}`}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0f172a] hover:bg-white/90"
-            >
-              Захиалга өгөх →
-            </Link>
-            <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-11 items-center justify-center rounded-xl border border-white/30 bg-[#0b1220]/40 px-5 text-[13px] font-medium text-white hover:bg-[#0b1220]/60"
-            >
-              Тест драйв захиалах
-            </Link>
           </div>
         </div>
       </section>

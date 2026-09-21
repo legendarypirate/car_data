@@ -104,12 +104,6 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
                   </p>
                 )}
                 <div className="mt-7 flex flex-wrap items-center gap-3">
-                  <Link
-                    href={`/contact?car=${car.slug}`}
-                    className="inline-flex h-11 items-center gap-2 rounded-xl bg-white px-5 text-[13px] font-semibold text-[#0f172a] hover:bg-white/90"
-                  >
-                    Захиалга өгөх <span>→</span>
-                  </Link>
                   <button
                     type="button"
                     onClick={() => setActiveVideoModal(car.name)}
@@ -182,12 +176,6 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
               variant="blue"
               className="h-10"
             />
-            <Link
-              href={`/contact?car=${car.slug}&type=testdrive`}
-              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#0b1220] px-4 text-[13px] font-semibold text-white hover:bg-[#1e293b]"
-            >
-              Тест драйв захиалах <span>→</span>
-            </Link>
           </div>
         </div>
       </div>
@@ -300,34 +288,6 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
             </div>
             )}
 
-            {/* Bottom Test Drive CTA Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-[#0c121d] p-8 text-white shadow-xl">
-              <div className="absolute inset-0 opacity-30">
-                <Image
-                  src={car.image}
-                  alt={car.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div>
-                  <h3 className="text-2xl font-extrabold text-white">
-                    {car.name}-ийг өөрийн нүдээр мэдрээрэй
-                  </h3>
-                  <p className="text-sm text-white/70 mt-1">
-                    Шоурумд ирж туршилтын жолоодлого хийх цагаа захиалаарай.
-                  </p>
-                </div>
-                <Link
-                  href={`/contact?car=${car.slug}&type=testdrive`}
-                  className="inline-flex h-11 items-center gap-2 rounded-xl bg-white px-6 text-[13px] font-bold text-[#0c121d] shadow-sm hover:bg-white/90 active:scale-95"
-                >
-                  <span>Тест драйв захиалах</span>
-                  <span>→</span>
-                </Link>
-              </div>
-            </div>
           </div>
         )}
 
