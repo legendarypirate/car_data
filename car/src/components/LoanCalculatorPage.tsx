@@ -8,6 +8,7 @@ import { formatAmount } from "@/lib/format";
 import {
   ADDITIONAL_MONTHLY_OPTIONS,
   calculateLoan,
+  DEFAULT_ADDITIONAL_MONTHLY,
   DEFAULT_ANNUAL_RATE,
   DEFAULT_DOWN_PERCENT,
   DOWN_PAYMENT_OPTIONS,
@@ -93,7 +94,7 @@ export function LoanCalculatorPage() {
     readNumber(searchParams.get("down"), DEFAULT_DOWN_PERCENT)
   );
   const [additionalMonthly, setAdditionalMonthly] = useState(
-    readNumber(searchParams.get("extra"), 0)
+    readNumber(searchParams.get("extra"), DEFAULT_ADDITIONAL_MONTHLY)
   );
 
   useEffect(() => {
