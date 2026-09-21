@@ -24,7 +24,6 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
   }));
   const firstTab = (tabs[0]?.id || "overview") as TabKey;
   const [activeTab, setActiveTab] = useState<TabKey>(firstTab);
-  const [galleryFilter, setGalleryFilter] = useState("all");
   const [activeVideoModal, setActiveVideoModal] = useState<string | null>(null);
   const currentTab = tabs.some((tab) => tab.id === activeTab) ? activeTab : firstTab;
   const interiorHero = interiorHeroSrc(car);
@@ -44,11 +43,6 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
     category: item.category,
     caption: item.caption || car.name,
   }));
-
-  const filteredGallery =
-    galleryFilter === "all"
-      ? galleryItems
-      : galleryItems.filter((item) => item.category === galleryFilter);
 
   // Tab Header Sub-title
   const headerInfo = {
@@ -198,49 +192,22 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
         {/* ============================================================== */}
         {currentTab === "gallery" && (
           <div className="space-y-12">
-            {/* Gallery Filter Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight text-ink">
-                  {tabConfig.gallery.title}
-                </h3>
-                <p className="mt-1 text-[13px] text-[#64748b]">
-                  {tabConfig.gallery.subtitle}
-                </p>
-              </div>
-
-              {/* Category Pills */}
-              <div className="flex flex-wrap items-center gap-2">
-                {[
-                  { id: "all", label: "Бүгд" },
-                  { id: "exterior", label: "Экстерьер" },
-                  { id: "interior", label: "Интерьер" },
-                  { id: "detail", label: "Деталь" },
-                  { id: "lifestyle", label: "Амьдралын хэв маяг" },
-                ].map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setGalleryFilter(f.id)}
-                    className={`rounded-lg px-3.5 py-1.5 text-[12px] font-bold transition-all ${
-                      galleryFilter === f.id
-                        ? "bg-[#0c121d] text-white shadow-sm"
-                        : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-ink hover:border-[#0c121d]"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
+            <div>
+              <h3 className="text-2xl font-bold tracking-tight text-ink">
+                {tabConfig.gallery.title}
+              </h3>
+              <p className="mt-1 text-[13px] text-[#64748b]">
+                {tabConfig.gallery.subtitle}
+              </p>
             </div>
 
-            {/* Photo Grid */}
-            {filteredGallery.length === 0 ? (
+            {galleryItems.length === 0 ? (
               <p className="rounded-2xl border border-dashed border-[#e2e8f0] px-6 py-16 text-center text-sm text-[#64748b]">
                 Галлерейн зураг алга.
               </p>
             ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {filteredGallery.slice(0, 2).map((item, i) => (
+              {galleryItems.slice(0, 2).map((item, i) => (
                 <div
                   key={i}
                   className="group relative aspect-[16/10] sm:col-span-2 overflow-hidden rounded-2xl bg-[#0c121d] shadow-sm border border-[#e2e8f0]"
@@ -263,7 +230,7 @@ export function CarDetailTabs({ car, similar }: { car: Car; similar: Car[] }) {
                 </div>
               ))}
 
-              {filteredGallery.slice(2).map((item, i) => (
+              {galleryItems.slice(2).map((item, i) => (
                 <div
                   key={i + 2}
                   className="group relative aspect-[16/11] overflow-hidden rounded-2xl bg-[#0c121d] shadow-sm border border-[#e2e8f0]"
